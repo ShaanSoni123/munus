@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        .user-info {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .job-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .application-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #fff3cd;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Job Application System Test</h1>
+    
+    <div class="container">
+        <h2>📋 Test Overview</h2>
+        <p>This page tests the complete job application system:</p>
+        <ul>
+            <li><strong>Employers</strong> can post jobs and view applications</li>
+            <li><strong>Job Seekers</strong> can view all jobs and apply to them</li>
+            <li><strong>Applications</strong> are tracked and visible to both parties</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>👤 User Authentication Status</h2>
+        <div id="userInfo" class="user-info">
+            <p><strong>Status:</strong> <span id="authStatus">Checking...</span></p>
+            <p><strong>User:</strong> <span id="userDetails">Loading...</span></p>
+            <p><strong>Role:</strong> <span id="userRole">Loading...</span></p>
+        </div>
+        
+        <button onclick="checkAuth()">🔄 Refresh Auth Status</button>
+        <button onclick="clearAuth()">🗑️ Clear Auth</button>
+    </div>
+
+    <div class="container">
+        <h2>🏢 Employer Tests</h2>
+        <div class="section info">
+            <h3>1. Post a New Job</h3>
+            <button onclick="postTestJob()">📝 Post Test Job</button>
+            <div id="postJobResult"></div>
+        </div>
+        
+        <div class="section info">
+            <h3>2. View My Jobs</h3>
+            <button onclick="getEmployerJobs()">👀 View My Jobs</button>
+            <div id="employerJobsResult"></div>
+        </div>
+        
+        <div class="section info">
+            <h3>3. View Applications for a Job</h3>
+            <input type="text" id="jobIdForApplications" placeholder="Enter Job ID" style="padding: 5px; margin: 5px;">
+            <button onclick="getJobApplications()">📋 View Applications</button>
+            <div id="jobApplicationsResult"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>👨‍💼 Job Seeker Tests</h2>
+        <div class="section info">
+            <h3>1. View All Available Jobs</h3>
+            <button onclick="getAllJobs()">🔍 View All Jobs</button>
+            <div id="allJobsResult"></div>
+        </div>
+        
+        <div class="section info">
+            <h3>2. Apply to a Job</h3>
+            <input type="text" id="jobIdToApply" placeholder="Enter Job ID" style="padding: 5px; margin: 5px;">
+            <button onclick="applyToJob()">📤 Apply to Job</button>
+            <div id="applyJobResult"></div>
+        </div>
+        
+        <div class="section info">
+            <h3>3. View My Applications</h3>
+            <button onclick="getMyApplications()">📋 View My Applications</button>
+            <div id="myApplicationsResult"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔄 Complete Workflow Test</h2>
+        <div class="section info">
+            <h3>End-to-End Test</h3>
+            <p>This will test the complete workflow:</p>
+            <ol>
+                <li>Post a job as employer</li>
+                <li>Switch to job seeker account</li>
+                <li>Apply to the job</li>
+                <li>Switch back to employer</li>
+                <li>View the application</li>
+            </ol>
+            <button onclick="runCompleteWorkflow()">🚀 Run Complete Workflow</button>
+            <div id="workflowResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        
+        // Helper function to get auth headers
+        function getAuthHeaders() {
+            const token = localStorage.getItem('skillglide-access-token');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : ''
+            };
+        }
+        
+        // Check authentication status
+        async function checkAuth() {
+            const userStr = localStorage.getItem('skillglide-user');
+            const token = localStorage.getItem('skillglide-access-token');
+            
+            document.getElementById('authStatus').textContent = userStr && token ? '✅ Authenticated' : '❌ Not Authenticated';
+            document.getElementById('userDetails').textContent = userStr ? JSON.parse(userStr).email : 'None';
+            document.getElementById('userRole').textContent = userStr ? JSON.parse(userStr).role : 'None';
+        }
+        
+        // Clear authentication
+        function clearAuth() {
+            localStorage.removeItem('skillglide-user');
+            localStorage.removeItem('skillglide-access-token');
+            checkAuth();
+        }
+        
+        // Post a test job (employer only)
+        async function postTestJob() {
+            try {
+                const response = await fetch(`${API_BASE}/jobs/`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        title: "Test Job - " + new Date().toLocaleString(),
+                        description: "This is a test job posting to verify the application system.",
+                        location: "Remote",
+                        job_type: "full-time",
+                        work_mode: "remote",
+                        experience_level: "entry",
+                        salary_min: 50000,
+                        salary_max: 80000,
+                        salary_currency: "INR",
+                        required_skills: ["JavaScript", "React", "Node.js"],
+                        requirements: ["2+ years experience", "Good communication skills"],
+                        responsibilities: ["Develop web applications", "Collaborate with team"],
+                        benefits: ["Health insurance", "Flexible hours"]
+                    })
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('postJobResult').innerHTML = `
+                        <div class="success">
+                            <h4>✅ Job Posted Successfully!</h4>
+                            <p><strong>Job ID:</strong> ${result._id || result.id}</p>
+                            <p><strong>Title:</strong> ${result.title}</p>
+                            <pre>${JSON.stringify(result, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('postJobResult').innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Post Job</h4>
+                            <p>${result.detail || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('postJobResult').innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Get employer jobs
+        async function getEmployerJobs() {
+            try {
+                const response = await fetch(`${API_BASE}/jobs/employer-jobs`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('employerJobsResult').innerHTML = `
+                        <div class="success">
+                            <h4>✅ Found ${result.length} Jobs</h4>
+                            ${result.map(job => `
+                                <div class="job-card">
+                                    <h5>${job.title}</h5>
+                                    <p><strong>ID:</strong> ${job._id || job.id}</p>
+                                    <p><strong>Location:</strong> ${job.location}</p>
+                                    <p><strong>Applications:</strong> ${job.applications_count || 0}</p>
+                                    <p><strong>Created:</strong> ${new Date(job.created_at).toLocaleString()}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('employerJobsResult').innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Get Jobs</h4>
+                            <p>${result.detail || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('employerJobsResult').innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Get job applications
+        async function getJobApplications() {
+            const jobId = document.getElementById('jobIdForApplications').value;
+            if (!jobId) {
+                alert('Please enter a Job ID');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/jobs/${jobId}/applications`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('jobApplicationsResult').innerHTML = `
+                        <div class="success">
+                            <h4>✅ Found ${result.length} Applications</h4>
+                            ${result.map(app => `
+                                <div class="application-card">
+                                    <h5>${app.applicant_name}</h5>
+                                    <p><strong>Email:</strong> ${app.applicant_email}</p>
+                                    <p><strong>Status:</strong> ${app.status}</p>
+                                    <p><strong>Applied:</strong> ${new Date(app.created_at).toLocaleString()}</p>
+                                    <p><strong>Cover Letter:</strong> ${app.cover_letter}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('jobApplicationsResult').innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Get Applications</h4>
+                            <p>${result.detail || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('jobApplicationsResult').innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Get all jobs
+        async function getAllJobs() {
+            try {
+                const response = await fetch(`${API_BASE}/jobs/`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('allJobsResult').innerHTML = `
+                        <div class="success">
+                            <h4>✅ Found ${result.length} Available Jobs</h4>
+                            ${result.map(job => `
+                                <div class="job-card">
+                                    <h5>${job.title}</h5>
+                                    <p><strong>ID:</strong> ${job._id || job.id}</p>
+                                    <p><strong>Company:</strong> ${job.company_name || job.employer_name}</p>
+                                    <p><strong>Location:</strong> ${job.location}</p>
+                                    <p><strong>Applications:</strong> ${job.applications_count || 0}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('allJobsResult').innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Get Jobs</h4>
+                            <p>${result.detail || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('allJobsResult').innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Apply to a job
+        async function applyToJob() {
+            const jobId = document.getElementById('jobIdToApply').value;
+            if (!jobId) {
+                alert('Please enter a Job ID');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/jobs/${jobId}/apply`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        cover_letter: "I am very interested in this position and believe my skills would be a great fit for your team. I am excited about the opportunity to contribute to your company's success.",
+                        resume_url: "",
+                        video_resume_url: "",
+                        audio_resume_url: "",
+                        portfolio_url: "",
+                        linkedin_url: "",
+                        github_url: ""
+                    })
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('applyJobResult').innerHTML = `
+                        <div class="success">
+                            <h4>✅ Application Submitted Successfully!</h4>
+                            <p><strong>Application ID:</strong> ${result._id}</p>
+                            <p><strong>Status:</strong> ${result.status}</p>
+                            <pre>${JSON.stringify(result, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('applyJobResult').innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Apply</h4>
+                            <p>${result.detail || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('applyJobResult').innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Get my applications
+        async function getMyApplications() {
+            try {
+                const response = await fetch(`${API_BASE}/jobs/applications/my-applications`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('myApplicationsResult').innerHTML = `
+                        <div class="success">
+                            <h4>✅ Found ${result.length} Applications</h4>
+                            ${result.map(app => `
+                                <div class="application-card">
+                                    <h5>Job ID: ${app.job_id}</h5>
+                                    <p><strong>Status:</strong> ${app.status}</p>
+                                    <p><strong>Applied:</strong> ${new Date(app.created_at).toLocaleString()}</p>
+                                    <p><strong>Cover Letter:</strong> ${app.cover_letter}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('myApplicationsResult').innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Get Applications</h4>
+                            <p>${result.detail || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('myApplicationsResult').innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Run complete workflow test
+        async function runCompleteWorkflow() {
+            const resultDiv = document.getElementById('workflowResult');
+            resultDiv.innerHTML = '<div class="info"><h4>🔄 Running Complete Workflow...</h4></div>';
+            
+            try {
+                // Step 1: Post a job as employer
+                resultDiv.innerHTML += '<p>📝 Step 1: Posting test job...</p>';
+                const jobResponse = await fetch(`${API_BASE}/jobs/`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        title: "Workflow Test Job - " + new Date().toLocaleString(),
+                        description: "This job was created as part of the workflow test.",
+                        location: "Remote",
+                        job_type: "full-time",
+                        work_mode: "remote",
+                        experience_level: "entry",
+                        salary_min: 60000,
+                        salary_max: 90000,
+                        salary_currency: "INR",
+                        required_skills: ["JavaScript", "React", "Node.js"],
+                        requirements: ["2+ years experience"],
+                        responsibilities: ["Develop applications"],
+                        benefits: ["Health insurance"]
+                    })
+                });
+                
+                const jobResult = await jobResponse.json();
+                if (!jobResponse.ok) {
+                    throw new Error(`Failed to post job: ${jobResult.detail}`);
+                }
+                
+                const jobId = jobResult._id || jobResult.id;
+                resultDiv.innerHTML += `<p>✅ Job posted successfully! Job ID: ${jobId}</p>`;
+                
+                // Step 2: Apply to the job (as job seeker)
+                resultDiv.innerHTML += '<p>📤 Step 2: Applying to the job...</p>';
+                const applyResponse = await fetch(`${API_BASE}/jobs/${jobId}/apply`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        cover_letter: "I am applying as part of the workflow test.",
+                        resume_url: "",
+                        video_resume_url: "",
+                        audio_resume_url: "",
+                        portfolio_url: "",
+                        linkedin_url: "",
+                        github_url: ""
+                    })
+                });
+                
+                const applyResult = await applyResponse.json();
+                if (!applyResponse.ok) {
+                    throw new Error(`Failed to apply: ${applyResult.detail}`);
+                }
+                
+                resultDiv.innerHTML += `<p>✅ Application submitted successfully!</p>`;
+                
+                // Step 3: View applications as employer
+                resultDiv.innerHTML += '<p>👀 Step 3: Viewing applications as employer...</p>';
+                const appsResponse = await fetch(`${API_BASE}/jobs/${jobId}/applications`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const appsResult = await appsResponse.json();
+                if (!appsResponse.ok) {
+                    throw new Error(`Failed to get applications: ${appsResult.detail}`);
+                }
+                
+                resultDiv.innerHTML += `<p>✅ Found ${appsResult.length} application(s)</p>`;
+                
+                // Final result
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>🎉 Complete Workflow Test Successful!</h4>
+                        <p><strong>Job ID:</strong> ${jobId}</p>
+                        <p><strong>Applications:</strong> ${appsResult.length}</p>
+                        <p><strong>Status:</strong> All steps completed successfully</p>
+                        <p>The job application system is working correctly!</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Workflow Test Failed</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize page
+        checkAuth();
+    </script>
+</body>
+</html> 

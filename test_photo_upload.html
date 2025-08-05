@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Upload Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        #results {
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Photo Upload Test</h1>
+    
+    <div class="test-section info">
+        <h3>Test 1: Backend Connection</h3>
+        <button onclick="testBackendConnection()">Test Backend Connection</button>
+        <div id="backend-result"></div>
+    </div>
+    
+    <div class="test-section info">
+        <h3>Test 2: Authentication</h3>
+        <input type="email" id="email" placeholder="Email" value="vfsoni@gmail.com">
+        <input type="password" id="password" placeholder="Password" value="Never@123">
+        <button onclick="testAuthentication()">Test Authentication</button>
+        <div id="auth-result"></div>
+    </div>
+    
+    <div class="test-section info">
+        <h3>Test 3: Photo Upload</h3>
+        <input type="file" id="photoFile" accept="image/*">
+        <button onclick="testPhotoUpload()">Test Photo Upload</button>
+        <div id="upload-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Results</h3>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let authToken = '';
+        
+        function log(message) {
+            const results = document.getElementById('results');
+            results.textContent += new Date().toISOString() + ': ' + message + '\n';
+            console.log(message);
+        }
+        
+        function setResult(elementId, message, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = isSuccess ? 'success' : 'error';
+        }
+        
+        async function testBackendConnection() {
+            try {
+                log('Testing backend connection...');
+                const response = await fetch('http://127.0.0.1:8000/api/v1/upload/test', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    setResult('backend-result', `✅ Backend connected: ${JSON.stringify(data)}`);
+                    log('Backend connection successful');
+                } else {
+                    setResult('backend-result', `❌ Backend connection failed: ${response.status}`, false);
+                    log('Backend connection failed');
+                }
+            } catch (error) {
+                setResult('backend-result', `❌ Backend connection error: ${error.message}`, false);
+                log('Backend connection error: ' + error.message);
+            }
+        }
+        
+        async function testAuthentication() {
+            try {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                log('Testing authentication...');
+                const response = await fetch('http://127.0.0.1:8000/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    setResult('auth-result', `✅ Authentication successful: ${data.user.name}`);
+                    log('Authentication successful');
+                } else {
+                    const error = await response.json();
+                    setResult('auth-result', `❌ Authentication failed: ${error.detail}`, false);
+                    log('Authentication failed: ' + error.detail);
+                }
+            } catch (error) {
+                setResult('auth-result', `❌ Authentication error: ${error.message}`, false);
+                log('Authentication error: ' + error.message);
+            }
+        }
+        
+        async function testPhotoUpload() {
+            try {
+                const fileInput = document.getElementById('photoFile');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    setResult('upload-result', '❌ Please select a file first', false);
+                    return;
+                }
+                
+                if (!authToken) {
+                    setResult('upload-result', '❌ Please authenticate first', false);
+                    return;
+                }
+                
+                log('Testing photo upload...');
+                log(`File: ${file.name}, Size: ${file.size} bytes, Type: ${file.type}`);
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const response = await fetch('http://127.0.0.1:8000/api/v1/upload/avatar', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    setResult('upload-result', `✅ Upload successful: ${data.avatar_url}`);
+                    log('Photo upload successful: ' + data.avatar_url);
+                    
+                    // Test if the uploaded image is accessible
+                    const imageUrl = `http://127.0.0.1:8000${data.avatar_url}`;
+                    log('Testing image accessibility: ' + imageUrl);
+                    
+                    const imageResponse = await fetch(imageUrl);
+                    if (imageResponse.ok) {
+                        log('✅ Uploaded image is accessible');
+                    } else {
+                        log('❌ Uploaded image is not accessible');
+                    }
+                } else {
+                    const error = await response.json();
+                    setResult('upload-result', `❌ Upload failed: ${error.detail}`, false);
+                    log('Photo upload failed: ' + error.detail);
+                }
+            } catch (error) {
+                setResult('upload-result', `❌ Upload error: ${error.message}`, false);
+                log('Photo upload error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html> 

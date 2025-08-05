@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API</title>
+</head>
+<body>
+    <h1>Testing API Connection</h1>
+    <div id="result"></div>
+    
+    <script>
+        async function testAPI() {
+            try {
+                console.log('Testing API...');
+                const response = await fetch('http://127.0.0.1:8000/api/v1/mongodb-jobs/');
+                const data = await response.json();
+                console.log('API Response:', data);
+                
+                document.getElementById('result').innerHTML = `
+                    <h2>API Test Results:</h2>
+                    <p>Total Jobs: ${data.total}</p>
+                    <p>Jobs Array Length: ${data.jobs ? data.jobs.length : 0}</p>
+                    <h3>First 3 Jobs:</h3>
+                    <ul>
+                        ${data.jobs ? data.jobs.slice(0, 3).map(job => 
+                            `<li>${job.title} at ${job.company_name} - ${job.location}</li>`
+                        ).join('') : 'No jobs found'}
+                    </ul>
+                `;
+            } catch (error) {
+                console.error('API Error:', error);
+                document.getElementById('result').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+        
+        testAPI();
+    </script>
+</body>
+</html>

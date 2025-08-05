@@ -1,0 +1,1440 @@
+/* Theme Variables */
+:root {
+  /* New Light Theme Design System */
+  --color-primary: #37B76C; /* Mint Green - Primary CTA */
+  --color-primary-light: #4CAF50;
+  --color-primary-dark: #2E7D32;
+  --color-secondary: #37B76C;
+  --color-accent: #37B76C;
+  --color-success: #37B76C;
+  --color-warning: #FF9800;
+  --color-error: #F44336;
+  
+  /* Background Colors */
+  --color-background: #ffffff; /* Pure White */
+  --color-surface: #ffffff; /* Pure White */
+  --color-surface-hover: #f5f5f5; /* Soft Light Grey */
+  --color-border: #e2e2e2; /* Light Grey Line */
+  --color-border-light: #e2e2e2;
+  
+  /* Background Shades */
+  --color-background-primary: #f5f5f5; /* Soft Light Grey */
+  --color-background-secondary: #f5f5f5;
+  --color-background-accent: #e9f7f0; /* Pale Green */
+  --color-background-success: #e9f7f0;
+  --color-background-warning: #FFF3E0;
+  --color-background-error: #FFEBEE;
+  
+  /* Text Colors */
+  --color-text-primary: #1c1c1c; /* Jet Black */
+  --color-text-secondary: #5f5f5f; /* Neutral Grey */
+  --color-text-muted: #a1a1a1; /* Muted Grey */
+  --color-text-inverse: #ffffff;
+  --color-text-accent: #37B76C;
+  --color-text-success: #37B76C;
+  --color-text-warning: #FF9800;
+  --color-text-error: #F44336;
+  
+  /* Shadows - Light with Soft Effects */
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.06);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  
+  /* Border Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark Neon Theme */
+.dark-neon {
+  --color-primary: #00D4FF;
+  --color-primary-light: #22D3EE;
+  --color-primary-dark: #0891B2;
+  --color-secondary: #A855F7;
+  --color-accent: #EC4899;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  
+  /* Neutral Colors - Dark */
+  --color-background: #0A0A0F;
+  --color-surface: #1A1A2E;
+  --color-surface-hover: #16213E;
+  --color-border: #2D3748;
+  --color-border-light: #4A5568;
+  
+  /* Dark Shade Backgrounds */
+  --color-background-primary: #0F1629;
+  --color-background-secondary: #1E1B3C;
+  --color-background-accent: #164E63;
+  --color-background-success: #064E3B;
+  --color-background-warning: #92400E;
+  --color-background-error: #991B1B;
+  
+  /* Text Colors - Dark - Enhanced for Better Visibility */
+  --color-text-primary: #F7FAFC;
+  --color-text-secondary: #E2E8F0;
+  --color-text-muted: #CBD5E0;
+  --color-text-inverse: #1A202C;
+  --color-text-accent: #00D4FF;
+  --color-text-success: #10B981;
+  --color-text-warning: #F59E0B;
+  --color-text-error: #EF4444;
+  
+  /* Shadows - Dark with Neon Glow */
+  --shadow-sm: 0 1px 2px 0 rgb(0 212 255 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 212 255 / 0.2), 0 2px 4px -2px rgb(0 212 255 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 212 255 / 0.3), 0 4px 6px -4px rgb(0 212 255 / 0.2);
+  --shadow-xl: 0 20px 25px -5px rgb(0 212 255 / 0.4), 0 8px 10px -6px rgb(0 212 255 / 0.3);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 212 255 / 0.5);
+}
+
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  line-height: 1.6;
+}
+
+/* New Light Theme Design System */
+.light {
+  background: #ffffff; /* Pure White */
+  min-height: 100vh;
+}
+
+.light .bg-light-pattern {
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(124, 58, 237, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(6, 182, 212, 0.03) 0%, transparent 50%);
+}
+
+.light .bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.02) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.light .hero-gradient {
+  background: linear-gradient(135deg, 
+    #F0F4FF 0%, 
+    #FFFFFF 25%, 
+    #F5F3FF 50%, 
+    #ECFEFF 75%, 
+    #F0FDF4 100%
+  );
+}
+
+.light .section-gradient {
+  background: linear-gradient(135deg, 
+    #FAFBFC 0%, 
+    #F8FAFC 50%, 
+    #F1F5F9 100%
+  );
+}
+
+.light .card-gradient {
+  background: linear-gradient(135deg, 
+    #FFFFFF 0%, 
+    #FAFBFC 100%
+  );
+}
+
+/* New Light Theme Card and Component Styling */
+.light .card,
+.light .Card {
+  background: #ffffff !important; /* Pure White */
+  border: 1px solid #e2e2e2 !important; /* Light Grey Line */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08) !important;
+  border-radius: 12px !important;
+}
+
+.light .card:hover,
+.light .Card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+/* Enhanced Light Theme Button Styling */
+.light button {
+  color: inherit;
+}
+
+/* New Light Theme Text Colors */
+.light h1,
+.light h2,
+.light h3,
+.light h4,
+.light h5,
+.light h6 {
+  color: #1c1c1c !important; /* Jet Black */
+  font-weight: 600;
+}
+
+.light p {
+  color: #5f5f5f !important; /* Neutral Grey */
+}
+
+.light .text-gray-600 {
+  color: #5f5f5f !important; /* Neutral Grey */
+}
+
+.light .text-gray-500 {
+  color: #5f5f5f !important; /* Neutral Grey */
+}
+
+.light .text-gray-400 {
+  color: #a1a1a1 !important; /* Muted Grey */
+}
+
+/* Ensure gradient text is visible in light theme */
+.light .bg-gradient-to-r.from-blue-600.to-purple-600.bg-clip-text.text-transparent,
+.light .bg-gradient-to-r.from-blue-600.via-purple-600.to-cyan-500.bg-clip-text.text-transparent {
+  background: linear-gradient(135deg, #1D4ED8 0%, #7C3AED 50%, #0891B2 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-weight: 800 !important;
+}
+
+/* Fix "Find Your Dream Job with AI" text visibility */
+.light .bg-gradient-to-r.from-blue-600.via-purple-600.to-cyan-500.bg-clip-text.text-transparent {
+  background: linear-gradient(135deg, #1E40AF 0%, #7C2D12 50%, #0F766E 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-weight: 900 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* New Light Theme Text Colors */
+.light .text-white {
+  color: #ffffff !important;
+}
+
+.light .text-gray-900 {
+  color: #1c1c1c !important; /* Jet Black */
+}
+
+.light .text-gray-800 {
+  color: #1c1c1c !important; /* Jet Black */
+}
+
+.light .text-gray-700 {
+  color: #5f5f5f !important; /* Neutral Grey */
+}
+
+/* New Light Theme Border Styling */
+.light .border-gray-200 {
+  border-color: #e2e2e2 !important; /* Light Grey Line */
+}
+
+.light .border-gray-300 {
+  border-color: #e2e2e2 !important; /* Light Grey Line */
+}
+
+.light .border-gray-400 {
+  border-color: #a1a1a1 !important; /* Muted Grey */
+}
+
+/* New Light Theme Background Styling */
+.light .bg-gray-50 {
+  background-color: #f5f5f5 !important; /* Soft Light Grey */
+}
+
+.light .bg-gray-100 {
+  background-color: #f5f5f5 !important; /* Soft Light Grey */
+}
+
+.light .bg-gray-200 {
+  background-color: #e2e2e2 !important; /* Light Grey Line */
+}
+
+.light .bg-gray-300 {
+  background-color: #e2e2e2 !important; /* Light Grey Line */
+}
+
+/* Enhanced Light Theme Badge Styling */
+.light .badge,
+.light .Badge {
+  color: inherit;
+}
+
+/* Enhanced Light Theme Modal and Dropdown Styling */
+.light .modal,
+.light .dropdown-menu {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.05) !important;
+}
+
+/* Enhanced Light Theme Table Styling */
+.light table,
+.light th,
+.light td {
+  color: #374151 !important;
+  border-color: #E5E7EB !important;
+}
+
+/* Enhanced Light Theme List Styling */
+.light ul,
+.light ol,
+.light li {
+  color: #374151 !important;
+}
+
+/* New Light Theme Form Styling */
+.light input,
+.light textarea,
+.light select {
+  color: #1c1c1c !important; /* Jet Black */
+  background-color: #ffffff !important; /* Pure White */
+  border: 1px solid #e2e2e2 !important; /* Light Grey Line */
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+}
+
+.light input:focus,
+.light textarea:focus,
+.light select:focus {
+  outline: none !important;
+  border: 2px solid #37B76C !important; /* Mint Green */
+  box-shadow: 0 0 0 3px rgba(55, 183, 108, 0.1) !important;
+}
+
+.light input::placeholder,
+.light textarea::placeholder {
+  color: #a1a1a1 !important; /* Muted Grey */
+}
+
+/* Enhanced Light Theme Navigation Styling */
+.light nav a,
+.light nav button {
+  color: #374151 !important;
+}
+
+.light nav a:hover,
+.light nav button:hover {
+  color: #1D4ED8 !important;
+  background-color: #F3F4F6 !important;
+}
+
+/* Enhanced Light Theme Header Styling */
+.light header {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: #E5E7EB !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+/* New Light Theme Component Styling */
+
+/* Resume Builder Page */
+.light .resume-builder-sidebar {
+  background: #f5f5f5 !important; /* Soft Light Grey */
+}
+
+.light .resume-builder-active-tab {
+  border-left: 3px solid #37B76C !important; /* Mint Green */
+  background: #e9f7f0 !important; /* Pale Green */
+}
+
+.light .resume-builder-content {
+  background: #ffffff !important; /* Pure White */
+}
+
+/* Job Cards */
+.light .job-card {
+  background: #ffffff !important; /* Pure White */
+  border: 1px solid #e2e2e2 !important; /* Light Grey Line */
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.light .job-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.light .job-title {
+  color: #1c1c1c !important; /* Jet Black */
+  font-weight: 600 !important;
+}
+
+.light .job-metadata {
+  color: #5f5f5f !important; /* Neutral Grey */
+}
+
+/* Tag Chips */
+.light .tag-chip {
+  background: #e9f7f0 !important; /* Pale Green */
+  color: #37B76C !important; /* Mint Green */
+  border: 1px solid #37B76C !important;
+  border-radius: 20px !important;
+  padding: 4px 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+/* Progress Bar */
+.light .progress-track {
+  background: #e2e2e2 !important; /* Light Grey Line */
+  border-radius: 10px !important;
+}
+
+.light .progress-filled {
+  background: #37B76C !important; /* Mint Green */
+  border-radius: 10px !important;
+}
+
+/* Import CV Feature */
+.light .import-cv-border {
+  border: 1px dashed #37B76C !important; /* Mint Green */
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.light .import-cv-border:hover {
+  background: #e9f7f0 !important; /* Pale Green */
+  border-color: #2fa25e !important;
+}
+
+/* Application Cards */
+.light .application-card {
+  background: #ffffff !important; /* Pure White */
+  border: 1px solid #e2e2e2 !important; /* Light Grey Line */
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.2s ease !important;
+}
+
+.light .application-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-1px);
+}
+
+/* New Light Theme Status Badge Styling */
+.light .status-accepted {
+  background-color: #e9f7f0 !important; /* Pale Green */
+  color: #37B76C !important; /* Mint Green */
+  border: 1px solid #37B76C !important;
+  border-radius: 20px !important; /* Rounded-Pill/Capsule */
+  padding: 4px 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+.light .status-rejected {
+  background-color: #FFEBEE !important;
+  color: #F44336 !important;
+  border: 1px solid #F44336 !important;
+  border-radius: 20px !important;
+  padding: 4px 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+.light .status-pending {
+  background-color: #FFF3E0 !important;
+  color: #FF9800 !important;
+  border: 1px solid #FF9800 !important;
+  border-radius: 20px !important;
+  padding: 4px 12px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+/* Enhanced Light Theme Info Grid Styling */
+.light .info-grid {
+  background-color: #F9FAFB !important;
+  border: 1px solid #E5E7EB !important;
+}
+
+/* New Light Theme Button Variants */
+.light .btn-primary {
+  background-color: #37B76C !important; /* Mint Green */
+  color: #ffffff !important;
+  border-color: #37B76C !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.light .btn-primary:hover {
+  background-color: #2fa25e !important; /* Slightly darker green */
+  border-color: #2fa25e !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(55, 183, 108, 0.3) !important;
+}
+
+.light .btn-outline {
+  background-color: transparent !important;
+  color: #37B76C !important; /* Mint Green */
+  border: 2px solid #37B76C !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.light .btn-outline:hover {
+  background-color: #e9f7f0 !important; /* Pale Green */
+  color: #37B76C !important;
+  transform: translateY(-1px);
+}
+
+/* Enhanced Light Theme Loading States */
+.light .loading-spinner {
+  border-color: #E5E7EB !important;
+  border-top-color: #2563EB !important;
+}
+
+/* Enhanced Light Theme Focus States */
+.light .focus-ring:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* Enhanced Light Theme Hover Effects */
+.light .hover-lift:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Enhanced Light Theme Glass Effect */
+.light .glass {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(20px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Enhanced Light Theme Selection */
+.light ::selection {
+  background: rgba(37, 99, 235, 0.2) !important;
+  color: #111827 !important;
+}
+
+/* Enhanced Light Theme Scrollbar */
+.light ::-webkit-scrollbar-track {
+  background: #F3F4F6 !important;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #2563EB, #7C3AED) !important;
+  border-radius: 9999px !important;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #1D4ED8, #6D28D9) !important;
+}
+
+/* Dark Neon Theme Specific Styles */
+.dark-neon {
+  background: radial-gradient(ellipse at top, #0f0f23 0%, #0a0a0f 50%, #050507 100%);
+  min-height: 100vh;
+}
+
+.dark-neon .bg-dark-pattern {
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+}
+
+.dark-neon .bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.dark-neon .hero-gradient {
+  background: linear-gradient(135deg, 
+    #0F1629 0%, 
+    #1A1A2E 25%, 
+    #1E1B3C 50%, 
+    #164E63 75%, 
+    #0A0A0F 100%
+  );
+}
+
+/* CRITICAL: Dark Neon Theme Text Visibility Fixes */
+.dark-neon h1,
+.dark-neon h2,
+.dark-neon h3,
+.dark-neon h4,
+.dark-neon h5,
+.dark-neon h6 {
+  color: #F7FAFC !important;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.dark-neon p {
+  color: #E2E8F0 !important;
+}
+
+/* Fix all gray text colors in dark theme */
+.dark-neon .text-gray-900 {
+  color: #F7FAFC !important;
+}
+
+.dark-neon .text-gray-800 {
+  color: #E2E8F0 !important;
+}
+
+.dark-neon .text-gray-700 {
+  color: #CBD5E0 !important;
+}
+
+.dark-neon .text-gray-600 {
+  color: #A0AEC0 !important;
+}
+
+.dark-neon .text-gray-500 {
+  color: #9CA3AF !important;
+}
+
+.dark-neon .text-gray-400 {
+  color: #9CA3AF !important;
+}
+
+.dark-neon .text-gray-300 {
+  color: #CBD5E0 !important;
+}
+
+.dark-neon .text-gray-200 {
+  color: #E2E8F0 !important;
+}
+
+.dark-neon .text-gray-100 {
+  color: #F7FAFC !important;
+}
+
+/* Fix white text to be more visible */
+.dark-neon .text-white {
+  color: #F7FAFC !important;
+  text-shadow: 0 0 5px rgba(0, 212, 255, 0.2);
+}
+
+/* Fix button text colors */
+.dark-neon button {
+  color: inherit;
+}
+
+.dark-neon .text-blue-600 {
+  color: #00D4FF !important;
+}
+
+.dark-neon .text-blue-700 {
+  color: #22D3EE !important;
+}
+
+.dark-neon .text-blue-800 {
+  color: #38BDF8 !important;
+}
+
+.dark-neon .text-purple-600 {
+  color: #A855F7 !important;
+}
+
+.dark-neon .text-purple-700 {
+  color: #9333EA !important;
+}
+
+.dark-neon .text-cyan-400 {
+  color: #22D3EE !important;
+}
+
+.dark-neon .text-cyan-300 {
+  color: #67E8F9 !important;
+}
+
+/* Fix link colors */
+.dark-neon a {
+  color: #00D4FF !important;
+}
+
+.dark-neon a:hover {
+  color: #22D3EE !important;
+}
+
+/* Fix navigation text */
+.dark-neon nav a,
+.dark-neon nav button {
+  color: #CBD5E0 !important;
+}
+
+.dark-neon nav a:hover,
+.dark-neon nav button:hover {
+  color: #00D4FF !important;
+}
+
+/* Fix form labels and inputs */
+.dark-neon label {
+  color: #E2E8F0 !important;
+}
+
+.dark-neon input,
+.dark-neon textarea,
+.dark-neon select {
+  color: #F7FAFC !important;
+  background-color: #1A202C !important;
+  border-color: #4A5568 !important;
+}
+
+.dark-neon input::placeholder,
+.dark-neon textarea::placeholder {
+  color: #9CA3AF !important;
+}
+
+/* Fix card text */
+.dark-neon .card h3,
+.dark-neon .card h4,
+.dark-neon .card p,
+.dark-neon .card span {
+  color: inherit;
+}
+
+/* Fix badge text */
+.dark-neon .badge {
+  color: inherit;
+}
+
+/* Fix dropdown and modal text */
+.dark-neon .dropdown-menu,
+.dark-neon .modal {
+  color: #E2E8F0 !important;
+}
+
+/* Fix table text */
+.dark-neon table,
+.dark-neon th,
+.dark-neon td {
+  color: #E2E8F0 !important;
+}
+
+/* Fix list text */
+.dark-neon ul,
+.dark-neon ol,
+.dark-neon li {
+  color: #CBD5E0 !important;
+}
+
+/* Fix small text */
+.dark-neon .text-sm {
+  color: #A0AEC0 !important;
+}
+
+.dark-neon .text-xs {
+  color: #9CA3AF !important;
+}
+
+/* Fix large text */
+.dark-neon .text-lg {
+  color: #E2E8F0 !important;
+}
+
+.dark-neon .text-xl {
+  color: #F7FAFC !important;
+}
+
+.dark-neon .text-2xl,
+.dark-neon .text-3xl,
+.dark-neon .text-4xl,
+.dark-neon .text-5xl {
+  color: #F7FAFC !important;
+  text-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+/* Fix muted text to be more visible */
+.dark-neon .text-muted {
+  color: #A0AEC0 !important;
+}
+
+/* Fix success, warning, error text colors */
+.dark-neon .text-green-600,
+.dark-neon .text-green-500,
+.dark-neon .text-green-400 {
+  color: #10B981 !important;
+}
+
+.dark-neon .text-yellow-600,
+.dark-neon .text-yellow-500,
+.dark-neon .text-orange-600,
+.dark-neon .text-orange-500 {
+  color: #F59E0B !important;
+}
+
+.dark-neon .text-red-600,
+.dark-neon .text-red-500,
+.dark-neon .text-red-400 {
+  color: #EF4444 !important;
+}
+
+/* Fix gradient text in dark theme */
+.dark-neon .bg-gradient-to-r.from-blue-600.to-purple-600.bg-clip-text.text-transparent,
+.dark-neon .bg-gradient-to-r.from-blue-600.via-purple-600.to-cyan-500.bg-clip-text.text-transparent {
+  background: linear-gradient(135deg, #00D4FF 0%, #A855F7 50%, #EC4899 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-weight: 800 !important;
+  filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-primary), var(--color-secondary));
+  border-radius: var(--radius-full);
+  transition: all var(--transition-normal);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--color-primary-dark), var(--color-secondary));
+}
+
+/* Dark theme scrollbar with enhanced neon effect */
+.dark-neon ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--color-primary), var(--color-secondary));
+  box-shadow: 0 0 10px var(--color-primary);
+}
+
+.dark-neon ::-webkit-scrollbar-thumb:hover {
+  box-shadow: 0 0 15px var(--color-primary), 0 0 25px var(--color-primary);
+}
+
+/* Animation Classes */
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-bounce-gentle {
+  animation: bounceGentle 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-gradient {
+  animation: gradient 8s ease infinite;
+  background-size: 400% 400%;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+.animate-theme-transition {
+  animation: themeTransition 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounceGentle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 20px var(--color-primary);
+  }
+  to {
+    box-shadow: 0 0 30px var(--color-primary), 0 0 40px var(--color-primary);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes themeTransition {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Gradient Backgrounds */
+.gradient-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);
+}
+
+.gradient-success {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-secondary) 100%);
+}
+
+.gradient-light {
+  background: linear-gradient(135deg, 
+    var(--color-background-primary) 0%, 
+    var(--color-background-secondary) 50%, 
+    var(--color-background-accent) 100%
+  );
+}
+
+/* Dark Neon Specific Effects */
+.dark-neon .glow {
+  box-shadow: 0 0 20px var(--color-primary), 0 0 40px var(--color-primary);
+}
+
+.dark-neon .glow-text {
+  text-shadow: 0 0 10px var(--color-primary);
+}
+
+.dark-neon .neon-border {
+  border: 1px solid var(--color-primary);
+  box-shadow: 0 0 10px var(--color-primary);
+}
+
+.dark-neon .neon-glow {
+  box-shadow: 
+    0 0 5px var(--color-primary),
+    0 0 10px var(--color-primary),
+    0 0 15px var(--color-primary),
+    0 0 20px var(--color-primary);
+}
+
+.dark-neon .neon-pulse {
+  animation: neonPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes neonPulse {
+  from {
+    box-shadow: 
+      0 0 5px var(--color-primary),
+      0 0 10px var(--color-primary),
+      0 0 15px var(--color-primary);
+  }
+  to {
+    box-shadow: 
+      0 0 10px var(--color-primary),
+      0 0 20px var(--color-primary),
+      0 0 30px var(--color-primary),
+      0 0 40px var(--color-primary);
+  }
+}
+
+/* Light Theme Specific Effects */
+.light .soft-shadow {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.light .hover-lift:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.light .gentle-glow {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+.light .light-border {
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.light .shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  background-size: 200% 100%;
+}
+
+/* Glass Morphism */
+.glass {
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.light .glass {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dark-neon .glass {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);
+}
+
+/* Loading States */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+.dark-neon .skeleton {
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Focus States */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.dark-neon .focus-ring {
+  @apply focus:ring-cyan-400 focus:ring-offset-gray-900;
+}
+
+.light .focus-ring {
+  @apply focus:ring-blue-500 focus:ring-offset-white;
+}
+
+/* Hover Effects */
+.hover-lift {
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+.hover-glow {
+  transition: box-shadow var(--transition-normal);
+}
+
+.light .hover-glow:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.dark-neon .hover-glow:hover {
+  box-shadow: 0 10px 25px rgba(0, 212, 255, 0.3);
+}
+
+/* Theme Toggle Button Styles */
+.theme-toggle {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-normal);
+}
+
+.theme-toggle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.theme-toggle:hover::before {
+  left: 100%;
+}
+
+.light .theme-toggle:hover {
+  background: linear-gradient(135deg, #F0F4FF, #E0E7FF);
+  transform: scale(1.05);
+}
+
+.dark-neon .theme-toggle:hover {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(168, 85, 247, 0.1));
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* Text Effects */
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark-neon .text-shadow {
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+}
+
+.light .text-shadow {
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Background Patterns for Light Theme */
+.light .dotted-pattern {
+  background-image: radial-gradient(circle, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.light .wave-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233B82F6' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  :root {
+    --spacing-sm: 6px;
+    --spacing-md: 12px;
+    --spacing-lg: 20px;
+    --spacing-xl: 28px;
+    --spacing-2xl: 40px;
+    --spacing-3xl: 56px;
+  }
+  
+  .light {
+    background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 50%, #E2E8F0 100%);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break-inside-avoid {
+    break-inside: avoid;
+  }
+  
+  .print-break-after {
+    break-after: page;
+  }
+  
+  * {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: #000000;
+    --color-text-primary: #000000;
+    --color-text-secondary: #000000;
+  }
+  
+  .dark-neon {
+    --color-border: #ffffff;
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #ffffff;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Selection Styles */
+::selection {
+  background: var(--color-primary);
+  color: white;
+}
+
+.dark-neon ::selection {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.light ::selection {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--color-text-primary);
+}
+
+/* Utility Classes */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Interactive Elements */
+.interactive {
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.interactive:hover {
+  transform: translateY(-1px);
+}
+
+.interactive:active {
+  transform: translateY(0);
+}
+
+/* Loading Spinner */
+.spinner {
+  border: 2px solid var(--color-border);
+  border-top: 2px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Theme-specific background patterns */
+.light .hero-pattern {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(124, 58, 237, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+}
+
+.dark-neon .hero-pattern {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(0, 212, 255, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.2) 0%, transparent 50%);
+}
+
+/* Enhanced Light Theme Backgrounds */
+.light-gradient-1 {
+  background: linear-gradient(135deg, #F0F4FF 0%, #E0E7FF 100%);
+}
+
+.light-gradient-2 {
+  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+}
+
+.light-gradient-3 {
+  background: linear-gradient(135deg, #ECFEFF 0%, #CFFAFE 100%);
+}
+
+.light-gradient-4 {
+  background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+}
+
+.light-gradient-5 {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+}
+
+/* Theme transition effects */
+.theme-transition {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-transition * {
+  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced Light Theme Text Contrast - Additional Fixes */
+.light .text-blue-600 {
+  color: #1D4ED8 !important;
+}
+
+.light .text-purple-600 {
+  color: #7C2D12 !important;
+}
+
+.light .text-cyan-500 {
+  color: #0F766E !important;
+}
+
+/* Fix for specific gradient text elements */
+.light span.bg-gradient-to-r {
+  background: linear-gradient(135deg, #1E40AF 0%, #7C2D12 50%, #0F766E 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-weight: 900 !important;
+}
+
+/* Ensure all headings are visible in light theme */
+.light h1, .light h2, .light h3, .light h4, .light h5, .light h6 {
+  color: #111827 !important;
+  text-shadow: none !important;
+}
+
+/* Fix for any remaining invisible text */
+.light * {
+  color: inherit;
+}
+
+.light .text-transparent {
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Specific fixes for common text elements */
+.light .text-xl,
+.light .text-lg,
+.light .text-base,
+.light .text-sm,
+.light .text-xs {
+  color: #374151 !important;
+}
+
+/* Fix for muted text */
+.light .text-gray-600,
+.light .text-gray-500,
+.light .text-gray-400 {
+  color: #6B7280 !important;
+}
+
+/* Ensure proper contrast for all interactive elements */
+.light button,
+.light a,
+.light .cursor-pointer {
+  color: inherit;
+}
+
+.light button:hover,
+.light a:hover {
+  color: #1D4ED8;
+}

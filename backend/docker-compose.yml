@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: skillglide_postgres
+    environment:
+      POSTGRES_DB: skillglide_db
+      POSTGRES_USER: skillglide_user
+      POSTGRES_PASSWORD: skillglide_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - skillglide_network
+
+  # Redis for caching and background tasks
+  redis:
+    image: redis:7-alpine
+    container_name: skillglide_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - skillglide_network
+
+  # FastAPI Backend
+  backend:
+    build: .
+    container_name: skillglide_backend
+    environment:
+      - DATABASE_URL=postgresql://skillglide_user:skillglide_password@postgres:5432/skillglide_db
+      - ASYNC_DATABASE_URL=postgresql+asyncpg://skillglide_user:skillglide_password@postgres:5432/skillglide_db
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./app:/app/app
+      - ./uploads:/app/uploads
+    networks:
+      - skillglide_network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Celery Worker for background tasks
+  celery_worker:
+    build: .
+    container_name: skillglide_celery_worker
+    environment:
+      - DATABASE_URL=postgresql://skillglide_user:skillglide_password@postgres:5432/skillglide_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./app:/app/app
+    networks:
+      - skillglide_network
+    command: celery -A app.tasks.celery worker --loglevel=info
+
+  # Celery Beat for scheduled tasks
+  celery_beat:
+    build: .
+    container_name: skillglide_celery_beat
+    environment:
+      - DATABASE_URL=postgresql://skillglide_user:skillglide_password@postgres:5432/skillglide_db
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./app:/app/app
+    networks:
+      - skillglide_network
+    command: celery -A app.tasks.celery beat --loglevel=info
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  skillglide_network:
+    driver: bridge

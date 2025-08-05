@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Visibility Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(116, 93, 93, 0.1);
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        .job-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .chef-job {
+            background-color: #fff3cd;
+            border-color: #ffeaa7;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Job Visibility Test</h1>
+    
+    <div class="container">
+        <h2>📋 Test Overview</h2>
+        <p>This page tests if jobs posted by employers are visible to job seekers:</p>
+        <ul>
+            <li><strong>All Jobs:</strong> Shows all jobs in the system</li>
+            <li><strong>Chef Jobs:</strong> Specifically looks for chef-related jobs</li>
+            <li><strong>Recent Jobs:</strong> Shows the most recently posted jobs</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>👤 Authentication Status</h2>
+        <div id="authInfo" class="section info">
+            <p><strong>Status:</strong> <span id="authStatus">Checking...</span></p>
+            <p><strong>User:</strong> <span id="userDetails">Loading...</span></p>
+            <p><strong>Role:</strong> <span id="userRole">Loading...</span></p>
+        </div>
+        
+        <button onclick="checkAuth()">🔄 Refresh Auth Status</button>
+        <button onclick="clearAuth()">🗑️ Clear Auth</button>
+    </div>
+
+    <div class="container">
+        <h2>🏢 All Available Jobs</h2>
+        <div class="section info">
+            <h3>1. Fetch All Jobs</h3>
+            <button onclick="fetchAllJobs()">📋 Get All Jobs</button>
+            <div id="allJobsResult"></div>
+        </div>
+        
+        <div class="section info">
+            <h3>2. Search for Chef Jobs</h3>
+            <input type="text" id="searchTerm" class="search-box" placeholder="Search for jobs (e.g., 'chef', 'cook', 'kitchen')" value="chef">
+            <button onclick="searchJobs()">🔍 Search Jobs</button>
+            <div id="searchResult"></div>
+        </div>
+        
+        <div class="section info">
+            <h3>3. Recent Jobs (Last 5)</h3>
+            <button onclick="getRecentJobs()">🕒 Get Recent Jobs</button>
+            <div id="recentJobsResult"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📊 Job Statistics</h2>
+        <div class="section info">
+            <h3>Job Analysis</h3>
+            <button onclick="analyzeJobs()">📈 Analyze Jobs</button>
+            <div id="analysisResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        
+        // Helper function to get auth headers
+        function getAuthHeaders() {
+            const token = localStorage.getItem('skillglide-access-token');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : ''
+            };
+        }
+        
+        // Check authentication status
+        async function checkAuth() {
+            const userStr = localStorage.getItem('skillglide-user');
+            const token = localStorage.getItem('skillglide-access-token');
+            
+            document.getElementById('authStatus').textContent = userStr && token ? '✅ Authenticated' : '❌ Not Authenticated';
+            document.getElementById('userDetails').textContent = userStr ? JSON.parse(userStr).email : 'None';
+            document.getElementById('userRole').textContent = userStr ? JSON.parse(userStr).role : 'None';
+        }
+        
+        // Clear authentication
+        function clearAuth() {
+            localStorage.removeItem('skillglide-user');
+            localStorage.removeItem('skillglide-access-token');
+            checkAuth();
+        }
+        
+        // Fetch all jobs
+        async function fetchAllJobs() {
+            try {
+                const response = await fetch(`${API_BASE}/jobs/`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('allJobsResult').innerHTML = `
+                        <div class="success">
+                            <h4>✅ Found ${result.length} Jobs</h4>
+                            ${result.map(job => `
+                                <div class="job-card ${job.title.toLowerCase().includes('chef') ? 'chef-job' : ''}">
+                                    <h5>${job.title}</h5>
+                                    <p><strong>ID:</strong> ${job._id || job.id}</p>
+                                    <p><strong>Company:</strong> ${job.company_name || job.employer_name}</p>
+                                    <p><strong>Location:</strong> ${job.location}</p>
+                                    <p><strong>Type:</strong> ${job.job_type}</p>
+                                    <p><strong>Applications:</strong> ${job.applications_count || 0}</p>
+                                    <p><strong>Posted:</strong> ${job.created_at ? new Date(job.created_at).toLocaleString() : 'Unknown'}</p>
+                                    <p><strong>Description:</strong> ${job.description ? job.description.substring(0, 100) + '...' : 'No description'}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('allJobsResult').innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Get Jobs</h4>
+                            <p>${result.detail || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('allJobsResult').innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Search jobs
+        async function searchJobs() {
+            const searchTerm = document.getElementById('searchTerm').value.toLowerCase();
+            
+            try {
+                const response = await fetch(`${API_BASE}/jobs/`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    const filteredJobs = result.filter(job => 
+                        job.title.toLowerCase().includes(searchTerm) ||
+                        job.description.toLowerCase().includes(searchTerm) ||
+                        (job.company_name && job.company_name.toLowerCase().includes(searchTerm)) ||
+                        (job.employer_name && job.employer_name.toLowerCase().includes(searchTerm))
+                    );
+                    
+                    document.getElementById('searchResult').innerHTML = `
+                        <div class="success">
+                            <h4>🔍 Found ${filteredJobs.length} Jobs Matching "${searchTerm}"</h4>
+                            ${filteredJobs.length === 0 ? '<p>No jobs found matching your search.</p>' : 
+                            filteredJobs.map(job => `
+                                <div class="job-card chef-job">
+                                    <h5>${job.title}</h5>
+                                    <p><strong>Company:</strong> ${job.company_name || job.employer_name}</p>
+                                    <p><strong>Location:</strong> ${job.location}</p>
+                                    <p><strong>Type:</strong> ${job.job_type}</p>
+                                    <p><strong>Applications:</strong> ${job.applications_count || 0}</p>
+                                    <p><strong>Posted:</strong> ${job.created_at ? new Date(job.created_at).toLocaleString() : 'Unknown'}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('searchResult').innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Search Jobs</h4>
+                            <p>${result.detail || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('searchResult').innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Get recent jobs
+        async function getRecentJobs() {
+            try {
+                const response = await fetch(`${API_BASE}/jobs/`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    // Sort by created_at and take the 5 most recent
+                    const recentJobs = result
+                        .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+                        .slice(0, 5);
+                    
+                    document.getElementById('recentJobsResult').innerHTML = `
+                        <div class="success">
+                            <h4>🕒 Recent Jobs (Last 5)</h4>
+                            ${recentJobs.map(job => `
+                                <div class="job-card ${job.title.toLowerCase().includes('chef') ? 'chef-job' : ''}">
+                                    <h5>${job.title}</h5>
+                                    <p><strong>Company:</strong> ${job.company_name || job.employer_name}</p>
+                                    <p><strong>Location:</strong> ${job.location}</p>
+                                    <p><strong>Posted:</strong> ${job.created_at ? new Date(job.created_at).toLocaleString() : 'Unknown'}</p>
+                                    <p><strong>Applications:</strong> ${job.applications_count || 0}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('recentJobsResult').innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Get Recent Jobs</h4>
+                            <p>${result.detail || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('recentJobsResult').innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Analyze jobs
+        async function analyzeJobs() {
+            try {
+                const response = await fetch(`${API_BASE}/jobs/`, {
+                    headers: getAuthHeaders()
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    const totalJobs = result.length;
+                    const chefJobs = result.filter(job => 
+                        job.title.toLowerCase().includes('chef') ||
+                        job.title.toLowerCase().includes('cook') ||
+                        job.title.toLowerCase().includes('kitchen')
+                    ).length;
+                    
+                    const jobTypes = {};
+                    const locations = {};
+                    const companies = {};
+                    
+                    result.forEach(job => {
+                        // Count job types
+                        const type = job.job_type || 'Unknown';
+                        jobTypes[type] = (jobTypes[type] || 0) + 1;
+                        
+                        // Count locations
+                        const location = job.location || 'Unknown';
+                        locations[location] = (locations[location] || 0) + 1;
+                        
+                        // Count companies
+                        const company = job.company_name || job.employer_name || 'Unknown';
+                        companies[company] = (companies[company] || 0) + 1;
+                    });
+                    
+                    document.getElementById('analysisResult').innerHTML = `
+                        <div class="success">
+                            <h4>📊 Job Analysis</h4>
+                            <p><strong>Total Jobs:</strong> ${totalJobs}</p>
+                            <p><strong>Chef/Kitchen Jobs:</strong> ${chefJobs}</p>
+                            <p><strong>Job Types:</strong></p>
+                            <ul>
+                                ${Object.entries(jobTypes).map(([type, count]) => `<li>${type}: ${count}</li>`).join('')}
+                            </ul>
+                            <p><strong>Top Locations:</strong></p>
+                            <ul>
+                                ${Object.entries(locations).slice(0, 5).map(([location, count]) => `<li>${location}: ${count}</li>`).join('')}
+                            </ul>
+                            <p><strong>Top Companies:</strong></p>
+                            <ul>
+                                ${Object.entries(companies).slice(0, 5).map(([company, count]) => `<li>${company}: ${count}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('analysisResult').innerHTML = `
+                        <div class="error">
+                            <h4>❌ Failed to Analyze Jobs</h4>
+                            <p>${result.detail || 'Unknown error'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('analysisResult').innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize page
+        checkAuth();
+    </script>
+</body>
+</html> 
