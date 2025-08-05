@@ -149,14 +149,21 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 @app.on_event("startup")
 async def startup_event():
     logger.info("Starting Jobify API server...")
-    await connect_to_mongo()
-    logger.info("MongoDB connection established")
+    try:
+        await connect_to_mongo()
+        logger.info("MongoDB connection established")
+    except Exception as e:
+        logger.error(f"Failed to connect to MongoDB: {e}")
+        # Don't fail startup for serverless deployment
 
 # Shutdown event
 @app.on_event("shutdown")
 async def shutdown_event():
     logger.info("Shutting down Jobify API server...")
-    await close_mongo_connection()
+    try:
+        await close_mongo_connection()
+    except Exception as e:
+        logger.error(f"Error closing MongoDB connection: {e}")
 
 # Root endpoint
 @app.get("/")
