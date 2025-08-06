@@ -1,12 +1,12 @@
 import axios from 'axios';
 
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://munus-backend.onrender.com';
 const API_VERSION = '/api/v1';
 
 // Create axios instance
 const apiClient = axios.create({
-  baseURL: API_BASE_URL ? `${API_BASE_URL}${API_VERSION}` : API_VERSION,
+  baseURL: `${API_BASE_URL}${API_VERSION}`,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
