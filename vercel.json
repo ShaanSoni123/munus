@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/app/main.py",
+      "src": "api/auth/*.py",
       "use": "@vercel/python"
     },
     {
@@ -15,20 +15,16 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/backend/app/main.py"
+      "src": "/api/v1/auth/register",
+      "dest": "/api/auth/register.py"
+    },
+    {
+      "src": "/api/v1/auth/login",
+      "dest": "/api/auth/login.py"
     },
     {
       "src": "/health",
-      "dest": "/backend/app/main.py"
-    },
-    {
-      "src": "/docs",
-      "dest": "/backend/app/main.py"
-    },
-    {
-      "src": "/openapi.json",
-      "dest": "/backend/app/main.py"
+      "dest": "/api/health.py"
     },
     {
       "src": "/(.*)",
