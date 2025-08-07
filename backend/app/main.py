@@ -148,13 +148,14 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 # Startup event
 @app.on_event("startup")
 async def startup_event():
-    logger.info("Starting Jobify API server...")
+    logger.info("Starting Munus API server...")
     try:
         await connect_to_mongo()
         logger.info("MongoDB connection established")
     except Exception as e:
         logger.error(f"Failed to connect to MongoDB: {e}")
-        # Don't fail startup for serverless deployment
+        logger.warning("Continuing startup without MongoDB connection")
+        # Don't fail startup - app can work without MongoDB for basic endpoints
 
 # Shutdown event
 @app.on_event("shutdown")
