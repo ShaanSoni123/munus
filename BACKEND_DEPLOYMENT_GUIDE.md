@@ -1,141 +1,153 @@
-# 🚀 Backend Deployment Guide for Railway
+# Backend Deployment Guide for Munus
 
-## **Step 1: Deploy Backend to Railway**
+## Problem
+Your frontend is deployed on Vercel at `gomunus.com`, but the backend server is not running, causing login and account creation to fail.
 
-1. **Go to [Railway.app](https://railway.app)**
-2. **Sign in with GitHub**
-3. **Click "New Project"**
-4. **Select "Deploy from GitHub repo"**
-5. **Choose your munus repository**
-6. **Select the `backend` folder as the source**
-7. **Click "Deploy"**
+## Solution: Deploy Backend to Render
 
-## **Step 2: Set Environment Variables in Railway**
+### Step 1: Prepare Your Backend for Deployment
 
-In your Railway project dashboard, go to **Variables** tab and add these:
-
-```bash
-# Database Configuration
-MONGODB_URI=mongodb+srv://your-mongodb-connection-string
-MONGODB_DB_NAME=munus
-
-# Security
-SECRET_KEY=4cfef7455812abbcf29d89cafa76112b75c64dfbe50e8ee6df54a8586ff1db8a
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-REFRESH_TOKEN_EXPIRE_DAYS=7
-
-# CORS (Important!)
-BACKEND_CORS_ORIGINS=["https://www.gomunus.com","https://gomunus.com","https://api.gomunus.com"]
-
-# Environment
-ENVIRONMENT=production
-DEBUG=false
-
-# API Configuration
-API_V1_STR=/api/v1
-PROJECT_NAME=Munus API
-VERSION=1.0.0
-
-# Email (Optional)
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=your-app-password
-MAIL_FROM=your-email@gmail.com
-MAIL_PORT=587
-MAIL_SERVER=smtp.gmail.com
-MAIL_FROM_NAME=Munus
-```
-
-## **Step 3: Get Your Railway Domain**
-
-1. **Go to your Railway project**
-2. **Click on your deployed service**
-3. **Copy the generated domain (e.g., `https://your-app-name.railway.app`)**
-
-## **Step 4: Update Frontend API URL**
-
-1. **Go to your Vercel dashboard**
-2. **Select your munus project**
-3. **Go to Settings → Environment Variables**
-4. **Add/Update:**
-   ```
-   VITE_API_BASE_URL=https://your-railway-domain.railway.app
-   ```
-
-## **Step 5: Test the Connection**
-
-1. **Visit your Railway domain + `/health`**
-   ```
-   https://your-railway-domain.railway.app/health
-   ```
-2. **You should see:**
-   ```json
-   {
-     "status": "healthy",
-     "timestamp": 1234567890.123,
-     "services": {
-       "mongodb": {"status": "healthy", "database": "mongodb"}
-     }
-   }
-   ```
-
-## **Step 6: Test Authentication**
-
-1. **Go to your deployed frontend: `https://gomunus.com`**
-2. **Try to register a new account**
-3. **Try to login with existing account**
-
-## **Alternative: Quick Fix for Testing**
-
-If you want to test locally first:
-
-1. **Update your local `.env` file:**
-   ```bash
-   VITE_API_BASE_URL=http://localhost:8000
-   ```
-
-2. **Start your local backend:**
+1. **Ensure your backend directory is ready:**
    ```bash
    cd backend
-   python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
 
-3. **Start your local frontend:**
-   ```bash
-   npm run dev
+2. **The following files have been created/updated:**
+   - `render.yaml` - Render deployment configuration
+   - `start_production.py` - Production startup script
+   - `requirements.txt` - Python dependencies (already exists)
+
+### Step 2: Deploy to Render
+
+1. **Go to [Render.com](https://render.com) and sign up/login**
+
+2. **Create a new Web Service:**
+   - Click "New +" → "Web Service"
+   - Connect your GitHub repository
+   - Select the repository containing your backend
+
+3. **Configure the service:**
+   - **Name:** `munus-backend`
+   - **Root Directory:** `backend` (if your backend is in a subdirectory)
+   - **Environment:** `Python 3`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `python start_production.py`
+
+4. **Set Environment Variables:**
+   Click "Environment" tab and add these variables:
+   
+   **Required Variables:**
+   - `MONGODB_URI`: Your MongoDB connection string
+   - `SECRET_KEY`: A secure random string for JWT tokens
+   
+   **Optional Variables (will use defaults if not set):**
+   - `MONGODB_DB_NAME`: `munus`
+   - `ALGORITHM`: `HS256`
+   - `ACCESS_TOKEN_EXPIRE_MINUTES`: `30`
+   - `REFRESH_TOKEN_EXPIRE_DAYS`: `7`
+   - `ENVIRONMENT`: `production`
+   - `DEBUG`: `false`
+
+5. **Deploy:**
+   - Click "Create Web Service"
+   - Wait for the build to complete (usually 5-10 minutes)
+
+### Step 3: Get Your Backend URL
+
+After deployment, Render will give you a URL like:
+`https://munus-backend-xxxx.onrender.com`
+
+### Step 4: Update Frontend Environment Variables
+
+1. **Go to your Vercel dashboard**
+2. **Navigate to your project settings**
+3. **Go to Environment Variables**
+4. **Add/Update:**
+   - `VITE_API_BASE_URL`: `https://munus-backend-xxxx.onrender.com` (replace with your actual Render URL)
+
+### Step 5: Redeploy Frontend
+
+1. **Trigger a new deployment in Vercel:**
+   - Go to your project dashboard
+   - Click "Deployments"
+   - Click "Redeploy" on the latest deployment
+
+### Step 6: Test Your Application
+
+1. **Visit your domain:** `https://www.gomunus.com`
+2. **Test login/registration functionality**
+3. **Check browser console for any errors**
+
+## Alternative: Quick Fix with Environment Variables
+
+If you want to quickly test without redeploying, you can temporarily update the API configuration:
+
+1. **Edit `src/services/api.ts`:**
+   ```typescript
+   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-render-backend-url.onrender.com';
    ```
 
-## **MongoDB Setup (Required)**
+2. **Redeploy to Vercel**
 
-You need a cloud MongoDB instance. Options:
+## MongoDB Setup
 
-1. **MongoDB Atlas (Free tier available)**
-2. **Railway MongoDB plugin**
-3. **Any cloud MongoDB provider**
+Make sure your MongoDB database is accessible from Render:
 
-Get your connection string and update `MONGODB_URI` in Railway environment variables.
+1. **If using MongoDB Atlas:**
+   - Ensure your IP whitelist includes `0.0.0.0/0` (allows all IPs)
+   - Or add Render's IP ranges
 
----
+2. **If using local MongoDB:**
+   - Consider migrating to MongoDB Atlas for production
 
-## **🚨 Common Issues & Solutions**
+## Troubleshooting
 
-### **Issue: CORS Errors**
-- Make sure `BACKEND_CORS_ORIGINS` includes your frontend domain
-- Check that the domain format is correct
+### Common Issues:
 
-### **Issue: Database Connection Failed**
-- Verify your MongoDB connection string
-- Make sure your MongoDB instance is accessible from Railway
+1. **Build fails on Render:**
+   - Check the build logs in Render dashboard
+   - Ensure all dependencies are in `requirements.txt`
 
-### **Issue: Environment Variables Not Loading**
-- Check that all variables are set in Railway dashboard
-- Redeploy after adding new variables
+2. **MongoDB connection fails:**
+   - Verify your `MONGODB_URI` is correct
+   - Check MongoDB network access settings
 
-### **Issue: Frontend Can't Connect to Backend**
-- Verify the `VITE_API_BASE_URL` is correct
-- Check that your Railway domain is accessible
-- Test the health endpoint manually
+3. **CORS errors:**
+   - The backend is configured to allow your domain
+   - Check browser console for CORS errors
 
----
+4. **Environment variables not working:**
+   - Ensure variables are set in Render dashboard
+   - Redeploy after adding variables
 
-**After completing these steps, your login and account creation should work! 🎉** 
+### Check Backend Health:
+
+Visit: `https://your-backend-url.onrender.com/health`
+
+Should return:
+```json
+{
+  "status": "healthy",
+  "timestamp": 1234567890,
+  "services": {
+    "mongodb": {"status": "healthy", "database": "mongodb"}
+  }
+}
+```
+
+## Next Steps
+
+After successful deployment:
+
+1. **Set up monitoring** in Render dashboard
+2. **Configure custom domain** for backend (optional)
+3. **Set up automatic deployments** from GitHub
+4. **Monitor logs** for any issues
+
+## Support
+
+If you encounter issues:
+1. Check Render deployment logs
+2. Check Vercel deployment logs
+3. Check browser console for frontend errors
+4. Verify all environment variables are set correctly 
