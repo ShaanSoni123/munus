@@ -83,8 +83,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                   ? 'text-gray-700' 
                   : 'text-gray-300'
               }`}>
-                Munus revolutionizes job hunting with AI-powered matching, smart resume building, 
-                and personalized career guidance. Join us to find your perfect career match.
+                Stop sending hundreds of job applications. Let our smart system find the right jobs for you. 
+                Create a great resume, apply with one click, and get hired faster.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">

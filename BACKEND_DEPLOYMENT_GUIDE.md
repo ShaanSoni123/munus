@@ -1,7 +1,7 @@
 # Backend Deployment Guide for Munus
 
 ## Problem
-Your frontend is deployed on Vercel at `gomunus.com`, but the backend server is not running, causing login and account creation to fail.
+Your frontend is deployed on Vercel at `gomunus.com` (your personal domain), but the backend server is not running, causing login and account creation to fail.
 
 ## Solution: Deploy Backend to Render
 
@@ -19,7 +19,7 @@ Your frontend is deployed on Vercel at `gomunus.com`, but the backend server is 
 
 ### Step 2: Deploy to Render
 
-1. **Go to [Render.com](https://render.com) and sign up/login**
+1. **Go to [Render.com](https://render.com) and sign up/login** 
 
 2. **Create a new Web Service:**
    - Click "New +" → "Web Service"
@@ -27,7 +27,7 @@ Your frontend is deployed on Vercel at `gomunus.com`, but the backend server is 
    - Select the repository containing your backend
 
 3. **Configure the service:**
-   - **Name:** `munus-backend`
+   - **Name:** `gomunus-backend` (or any name you prefer)
    - **Root Directory:** `backend` (if your backend is in a subdirectory)
    - **Environment:** `Python 3`
    - **Build Command:** `pip install -r requirements.txt`
@@ -55,7 +55,9 @@ Your frontend is deployed on Vercel at `gomunus.com`, but the backend server is 
 ### Step 3: Get Your Backend URL
 
 After deployment, Render will give you a URL like:
-`https://munus-backend-xxxx.onrender.com`
+`https://gomunus-backend-xxxx.onrender.com`
+
+**Note:** You can also set up a custom subdomain like `api.gomunus.com` or `backend.gomunus.com` later if desired.
 
 ### Step 4: Update Frontend Environment Variables
 
@@ -63,7 +65,9 @@ After deployment, Render will give you a URL like:
 2. **Navigate to your project settings**
 3. **Go to Environment Variables**
 4. **Add/Update:**
-   - `VITE_API_BASE_URL`: `https://munus-backend-xxxx.onrender.com` (replace with your actual Render URL)
+   - `VITE_API_BASE_URL`: `https://gomunus-backend-xxxx.onrender.com` (replace with your actual Render URL)
+   
+   **Optional:** You can also set this to a custom subdomain like `https://api.gomunus.com` if you set up DNS routing.
 
 ### Step 5: Redeploy Frontend
 
@@ -84,7 +88,7 @@ If you want to quickly test without redeploying, you can temporarily update the 
 
 1. **Edit `src/services/api.ts`:**
    ```typescript
-   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://your-render-backend-url.onrender.com';
+   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://gomunus-backend-xxxx.onrender.com';
    ```
 
 2. **Redeploy to Vercel**
@@ -122,7 +126,7 @@ Make sure your MongoDB database is accessible from Render:
 
 ### Check Backend Health:
 
-Visit: `https://your-backend-url.onrender.com/health`
+Visit: `https://gomunus-backend-xxxx.onrender.com/health` (replace with your actual backend URL)
 
 Should return:
 ```json
@@ -140,7 +144,9 @@ Should return:
 After successful deployment:
 
 1. **Set up monitoring** in Render dashboard
-2. **Configure custom domain** for backend (optional)
+2. **Configure custom domain** for backend (optional but recommended):
+   - Set up `api.gomunus.com` or `backend.gomunus.com` to point to your Render service
+   - This makes your API calls cleaner and more professional
 3. **Set up automatic deployments** from GitHub
 4. **Monitor logs** for any issues
 
@@ -150,4 +156,13 @@ If you encounter issues:
 1. Check Render deployment logs
 2. Check Vercel deployment logs
 3. Check browser console for frontend errors
-4. Verify all environment variables are set correctly 
+4. Verify all environment variables are set correctly
+
+## Your Domain Setup
+
+Since `gomunus.com` is your personal domain, you have full control over:
+- Frontend deployment (Vercel)
+- Backend deployment (Render)
+- DNS configuration
+- Custom subdomains (api.gomunus.com, backend.gomunus.com, etc.)
+- SSL certificates (handled automatically by Vercel and Render) 

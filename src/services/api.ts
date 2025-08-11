@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-// API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://munus-backend.onrender.com';
+// API Configuration - Updated for production
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://gomunus-backend.onrender.com';
 const API_VERSION = '/api/v1';
 
-// Create axios instance
+// Create axios instance with better error handling
 const apiClient = axios.create({
   baseURL: `${API_BASE_URL}${API_VERSION}`,
   timeout: 30000,
@@ -32,7 +32,7 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor to handle token refresh
+// Response interceptor with better error handling
 apiClient.interceptors.response.use(
   (response: any) => {
     console.log(`Response from ${response.config.url}:`, response.status);
@@ -99,16 +99,24 @@ apiClient.interceptors.response.use(
       }
     } else if (error.message) {
       errorMessage = error.message;
-    } else if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
-      errorMessage = 'Cannot connect to server. Please make sure the backend is running on http://localhost:8000';
-    } else if (error.message === 'Network Error') {
-      errorMessage = 'Cannot connect to server. Please make sure the backend is running on http://localhost:8000';
     }
 
-    // Create a new error with the formatted message
-    const formattedError = new Error(errorMessage);
-    console.error('Formatted error:', formattedError.message);
-    return Promise.reject(formattedError);
+    // Handle connection errors more gracefully
+    if (error.code === 'ECONNREFUSED' || error.code === 'NETWORK_ERROR') {
+      errorMessage = 'Unable to connect to our servers. Please check your internet connection and try again.';
+    } else if (error.code === 'TIMEOUT') {
+      errorMessage = 'Request timed out. Please try again.';
+    }
+
+    // Create a more user-friendly error object
+    const userFriendlyError = {
+      ...error,
+      userMessage: errorMessage,
+      isConnectionError: error.code === 'ECONNREFUSED' || error.code === 'NETWORK_ERROR',
+      isTimeoutError: error.code === 'TIMEOUT'
+    };
+
+    return Promise.reject(userFriendlyError);
   }
 );
 
