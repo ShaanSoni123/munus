@@ -117,7 +117,7 @@ export interface Certification {
 export type JobType = 'full-time' | 'part-time' | 'internship' | 'contract' | 'freelance';
 export type WorkMode = 'remote' | 'onsite' | 'hybrid';
 export type ExperienceLevel = 'fresher' | '1-2' | '3-5' | '5+';
-export type Theme = 'light' | 'dark-neon';
+export type Theme = 'light' | 'dark' | 'dark-neon';
 
 export interface SalaryRange {
   min: number;

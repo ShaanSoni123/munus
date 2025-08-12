@@ -28,6 +28,7 @@ import { NotificationsPage } from './components/notifications/NotificationsPage'
 import { AIChatbot } from './components/common/AIChatbot';
 
 const AppContent: React.FC = () => {
+  console.log('🚀 AppContent component rendering...'); // DEBUG LINE - ADDED
   const [currentView, setCurrentView] = useState<'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications'>('home');
   
   // Wrapper function to log navigation changes
