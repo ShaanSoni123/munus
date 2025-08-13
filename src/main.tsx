@@ -65,6 +65,16 @@ if (!rootElement) {
   try {
     const root = createRoot(rootElement);
     
+    // Add a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.warn('⚠️ App taking too long to load, showing fallback...');
+      root.render(
+        <StrictMode>
+          <FallbackApp />
+        </StrictMode>
+      );
+    }, 10000); // 10 second timeout
+    
     // Try to render the main app first
     root.render(
       <StrictMode>
@@ -72,6 +82,8 @@ if (!rootElement) {
       </StrictMode>
     );
     
+    // Clear timeout if app loads successfully
+    clearTimeout(timeoutId);
     console.log('✅ React app rendered successfully');
   } catch (error) {
     console.error('❌ Error rendering React app:', error);
