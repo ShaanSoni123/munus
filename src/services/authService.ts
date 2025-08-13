@@ -32,22 +32,34 @@ export interface AuthResponse {
 class AuthService {
   async login(email: string, password: string, role: 'jobseeker' | 'employer'): Promise<any> {
     try {
-      const response = await api.post('/auth/login', { email, password, role });
+      console.log('🔐 AuthService: Attempting login', { email, role });
+      // Don't send role to backend - it will be retrieved from the user's stored data
+      const response = await api.post('/auth/login', { email, password });
+      console.log('✅ AuthService: Login response received', response.data);
+      
       const { access_token, user } = response.data;
       
       // Transform user data to match frontend expectations
       const transformedUser = {
         ...user,
-        id: user._id, // Map MongoDB _id to frontend id
+        id: user._id || user.id, // Map MongoDB _id to frontend id
         role: user.role // Ensure role is properly set
       };
+      
+      console.log('🔄 AuthService: Transformed user', transformedUser);
       
       // Store user data and token
       localStorage.setItem('skillglide-access-token', access_token);
       localStorage.setItem('skillglide-user', JSON.stringify(transformedUser));
       
+      console.log('💾 AuthService: Stored in localStorage');
+      
+      // Dispatch custom event to notify app of auth state change
+      window.dispatchEvent(new CustomEvent('auth-state-changed'));
+      
       return { ...response.data, user: transformedUser };
     } catch (error: any) {
+      console.error('❌ AuthService: Login failed', error);
       const errorMessage = error.response?.data?.detail || 'Login failed. Please check your credentials.';
       throw new Error(errorMessage);
     }
@@ -55,6 +67,8 @@ class AuthService {
 
   async register(userData: RegisterRequest): Promise<any> {
     try {
+      console.log('📝 AuthService: Attempting registration', userData);
+      
       // Prepare payload with all necessary fields
       const payload = {
         email: userData.email,
@@ -73,21 +87,31 @@ class AuthService {
         }),
       };
 
+      console.log('📤 AuthService: Sending registration payload', payload);
       const response = await api.post('/auth/register/', payload);
+      console.log('✅ AuthService: Registration response received', response.data);
       
       // Transform user data to match frontend expectations
       const transformedUser = {
         ...response.data.user,
-        id: response.data.user._id, // Map MongoDB _id to frontend id
+        id: response.data.user._id || response.data.user.id, // Map MongoDB _id to frontend id
         role: response.data.user.role // Ensure role is properly set
       };
+      
+      console.log('🔄 AuthService: Transformed user', transformedUser);
       
       // Store user data and token
       localStorage.setItem('skillglide-user', JSON.stringify(transformedUser));
       localStorage.setItem('skillglide-access-token', response.data.access_token);
       
+      console.log('💾 AuthService: Stored in localStorage');
+      
+      // Dispatch custom event to notify app of auth state change
+      window.dispatchEvent(new CustomEvent('auth-state-changed'));
+      
       return { ...response.data, user: transformedUser };
     } catch (error: any) {
+      console.error('❌ AuthService: Registration failed', error);
       const errorMessage = error.response?.data?.detail || 'Registration failed. Please try again.';
       throw new Error(errorMessage);
     }

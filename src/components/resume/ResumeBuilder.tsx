@@ -68,7 +68,7 @@ export const ResumeBuilder: React.FC = () => {
       console.log('Starting PDF generation with data:', resumeData);
       
       // Generate PDF using the resume service
-      const result = await resumeService.generatePDF(resumeData);
+      const result = await resumeService.generatePDFFromData(resumeData);
       
       console.log('PDF generation result:', result);
       
@@ -148,7 +148,13 @@ export const ResumeBuilder: React.FC = () => {
           />
         );
       case 'preview':
-        return <PreviewStep resumeData={resumeData} />;
+        return (
+          <PreviewStep 
+            resumeData={resumeData} 
+            onDownloadPDF={handleDownloadPDF}
+            isGeneratingPDF={isGeneratingPDF}
+          />
+        );
       default:
         return null;
     }
@@ -253,24 +259,7 @@ export const ResumeBuilder: React.FC = () => {
               </Button>
 
               <div className="flex space-x-2">
-                {currentStep === steps.length - 1 ? (
-                  <>
-                    <Button
-                      variant="secondary"
-                      icon={isGeneratingPDF ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                      onClick={handleDownloadPDF}
-                      disabled={isGeneratingPDF}
-                    >
-                      {isGeneratingPDF ? 'Generating PDF...' : 'Download PDF'}
-                    </Button>
-                    <Button
-                      variant="primary"
-                      icon={<FileText className="w-4 h-4" />}
-                    >
-                      Save Resume
-                    </Button>
-                  </>
-                ) : (
+                {currentStep < steps.length - 1 && (
                   <Button variant="primary" onClick={nextStep}>
                     Next Step
                   </Button>

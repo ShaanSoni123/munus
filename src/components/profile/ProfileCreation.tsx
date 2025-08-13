@@ -293,6 +293,13 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
     setIsSubmitting(true);
     setErrors({}); // Clear any previous errors
     
+    // Validate that userType is selected
+    if (!profileData.userType) {
+      setErrors({ userType: 'Please select your role before proceeding' });
+      setIsSubmitting(false);
+      return;
+    }
+    
     try {
       // Upload photo first if selected
       let avatarUrl = '';
@@ -317,7 +324,7 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
         name: `${profileData.firstName} ${profileData.lastName}`,
         email: profileData.email,
         password: profileData.password,
-        role: profileData.userType,
+        role: profileData.userType as 'jobseeker' | 'employer',
         phone: profileData.phone,
         location: profileData.location,
         ...(avatarUrl && { avatar_url: avatarUrl }),
@@ -460,23 +467,35 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
 
   const renderRoleSelection = () => (
     <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h3 className={`text-2xl font-bold mb-4 ${
+      <div className="text-center mb-6 sm:mb-8">
+        <div className="flex items-center justify-center space-x-2 mb-4">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
+            <img 
+              src="/Users/shaansoni/Documents/Screenshot 2025-08-14 at 12.56.36 AM.png" 
+              alt="Munus Logo" 
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
+            Munus
+          </h1>
+        </div>
+        <h3 className={`text-xl sm:text-2xl font-bold mb-3 sm:mb-4 ${
           theme === 'light' ? 'text-gray-900' : 'text-white'
         }`}>
           Welcome to Munus!
         </h3>
-        <p className={`text-lg ${
+        <p className={`text-base sm:text-lg ${
           theme === 'light' ? 'text-gray-600' : 'text-gray-400'
         }`}>
           Let's get started by understanding how you'd like to use our platform
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6">
         <button
           onClick={() => updateProfileData('userType', 'jobseeker')}
-          className={`p-8 rounded-2xl border-2 transition-all duration-300 text-left hover:scale-105 ${
+          className={`p-6 sm:p-8 rounded-2xl border-2 transition-all duration-300 text-left hover:scale-105 ${
             profileData.userType === 'jobseeker'
               ? `border-blue-500 ${
                   theme === 'light' 
@@ -488,17 +507,17 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
                 }`
           }`}
         >
-          <div className={`w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 ${
+          <div className={`w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 ${
             theme === 'dark-neon' ? 'shadow-lg shadow-blue-500/25' : 'shadow-lg'
           }`}>
-            <User className="w-8 h-8 text-white" />
+            <User className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           </div>
-          <h4 className={`text-xl font-bold mb-2 ${
+          <h4 className={`text-lg sm:text-xl font-bold mb-2 ${
             theme === 'light' ? 'text-gray-900' : 'text-white'
           }`}>
             I'm a Job Seeker
           </h4>
-          <p className={`${
+          <p className={`text-sm sm:text-base ${
             theme === 'light' ? 'text-gray-600' : 'text-gray-400'
           }`}>
             Looking for my next career opportunity. I want to find jobs, build my resume, and connect with employers.
@@ -512,7 +531,7 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
 
         <button
           onClick={() => updateProfileData('userType', 'employer')}
-          className={`p-8 rounded-2xl border-2 transition-all duration-300 text-left hover:scale-105 ${
+          className={`p-6 sm:p-8 rounded-2xl border-2 transition-all duration-300 text-left hover:scale-105 ${
             profileData.userType === 'employer'
               ? `border-purple-500 ${
                   theme === 'light' 
@@ -524,17 +543,17 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
                 }`
           }`}
         >
-          <div className={`w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4 ${
+          <div className={`w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4 ${
             theme === 'dark-neon' ? 'shadow-lg shadow-purple-500/25' : 'shadow-lg'
           }`}>
-            <Building className="w-8 h-8 text-white" />
+            <Building className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           </div>
-          <h4 className={`text-xl font-bold mb-2 ${
+          <h4 className={`text-lg sm:text-xl font-bold mb-2 ${
             theme === 'light' ? 'text-gray-900' : 'text-white'
           }`}>
             I'm an Employer
           </h4>
-          <p className={`${
+          <p className={`text-sm sm:text-base ${
             theme === 'light' ? 'text-gray-600' : 'text-gray-400'
           }`}>
             Looking to hire talented professionals. I want to post jobs, review applications, and find the right candidates.
@@ -1444,30 +1463,61 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
   };
 
   return (
-    <div className={`min-h-screen py-12 ${
+    <div className={`min-h-screen py-8 sm:py-12 ${
       theme === 'light' 
         ? 'bg-gradient-to-br from-blue-50 via-white to-purple-50' 
         : 'bg-gradient-to-br from-gray-900 via-gray-900 to-blue-900'
     }`}>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <style>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          scrollbar-width: none;
+        }
+        .progress-scroll {
+          scroll-behavior: smooth;
+          -webkit-overflow-scrolling: touch;
+        }
+        @media (max-width: 480px) {
+          .progress-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+          }
+          .progress-steps {
+            gap: 0.5rem;
+          }
+          .progress-line {
+            width: 1.5rem;
+            margin: 0 0.25rem;
+          }
+        }
+      `}</style>
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className={`w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center ${
-              theme === 'dark-neon' ? 'shadow-lg shadow-blue-500/25' : 'shadow-lg'
-            }`}>
-              <Zap className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
+              <img 
+                src="/Users/shaansoni/Documents/Screenshot 2025-08-14 at 12.56.36 AM.png" 
+                alt="Munus Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
-              SkillGlide
+            <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
+              Munus
             </h1>
           </div>
-          <h2 className={`text-3xl font-bold mb-2 ${
+          <h2 className={`text-2xl sm:text-3xl font-bold mb-2 ${
             theme === 'light' ? 'text-gray-900' : 'text-white'
           }`}>
-            Create Your Profile
+            Create Your Munus Profile
           </h2>
-          <p className={`${
+          <p className={`text-sm sm:text-base ${
             theme === 'light' ? 'text-gray-600' : 'text-gray-400'
           }`}>
             {profileData.userType === 'jobseeker' 
@@ -1480,43 +1530,45 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
         </div>
 
         {/* Progress Steps */}
-        <div className="mb-8">
-          <div className="flex items-center justify-center space-x-4 mb-4">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              const isActive = index === currentStep;
-              const isComplete = index < currentStep;
-              
-              return (
-                <div key={step.id} className="flex items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
-                    isActive
-                      ? `bg-blue-600 text-white ${theme === 'dark-neon' ? 'shadow-lg shadow-blue-500/25' : 'shadow-lg'}`
-                      : isComplete
-                      ? 'bg-green-500 text-white'
-                      : `${theme === 'light' ? 'bg-gray-200 text-gray-500' : 'bg-gray-700 text-gray-500'}`
-                  }`}>
-                    <Icon className="w-5 h-5" />
+        <div className="mb-8 progress-container">
+          <div className="relative min-w-full">
+            <div className="flex items-center justify-center space-x-2 sm:space-x-4 mb-4 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide min-w-full progress-scroll progress-steps">
+              {steps.map((step, index) => {
+                const Icon = step.icon;
+                const isActive = index === currentStep;
+                const isComplete = index < currentStep;
+                
+                return (
+                  <div key={step.id} className="flex items-center flex-shrink-0">
+                    <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all ${
+                      isActive
+                        ? `bg-blue-600 text-white ${theme === 'dark-neon' ? 'shadow-lg shadow-blue-500/25' : 'shadow-lg'}`
+                        : isComplete
+                        ? 'bg-green-500 text-white'
+                        : `${theme === 'light' ? 'bg-gray-200 text-gray-500' : 'bg-gray-700 text-gray-500'}`
+                    }`}>
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </div>
+                    {index < steps.length - 1 && (
+                      <div className={`w-8 sm:w-12 md:w-16 h-1 mx-1 sm:mx-2 progress-line ${
+                        isComplete 
+                          ? 'bg-green-500' 
+                          : theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'
+                      }`} />
+                    )}
                   </div>
-                  {index < steps.length - 1 && (
-                    <div className={`w-16 h-1 mx-2 ${
-                      isComplete 
-                        ? 'bg-green-500' 
-                        : theme === 'light' ? 'bg-gray-200' : 'bg-gray-700'
-                    }`} />
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
           
-          <div className="text-center">
-            <h3 className={`text-lg font-semibold ${
+          <div className="text-center px-2">
+            <h3 className={`text-sm sm:text-base md:text-lg font-semibold ${
               theme === 'light' ? 'text-gray-900' : 'text-white'
             }`}>
               {steps[currentStep].name}
             </h3>
-            <p className={`text-sm ${
+            <p className={`text-xs sm:text-sm ${
               theme === 'light' ? 'text-gray-600' : 'text-gray-400'
             }`}>
               Step {currentStep + 1} of {steps.length}
@@ -1538,12 +1590,12 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
 
         {/* Main Content */}
         <Card className="max-w-3xl mx-auto">
-          <div className="min-h-[500px]">
+          <div className="min-h-[350px] sm:min-h-[400px] md:min-h-[500px] p-3 sm:p-4 md:p-6">
             {renderStepContent()}
           </div>
 
           {/* Navigation Buttons */}
-          <div className={`flex justify-between items-center pt-8 border-t ${
+          <div className={`flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-0 pt-4 sm:pt-6 md:pt-8 border-t px-3 sm:px-4 md:px-6 ${
             theme === 'light' ? 'border-gray-200' : 'border-gray-700'
           }`}>
             <Button
@@ -1551,11 +1603,12 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
               onClick={currentStep === 0 ? onBack : prevStep}
               disabled={isSubmitting}
               icon={<ArrowLeft className="w-4 h-4" />}
+              className="w-full sm:w-auto order-2 sm:order-1"
             >
               {currentStep === 0 ? 'Back to Home' : 'Previous'}
             </Button>
 
-            <div className="flex space-x-3">
+            <div className="flex w-full sm:w-auto justify-center sm:justify-end order-1 sm:order-2">
               {currentStep === steps.length - 1 ? (
                 <Button
                   variant="primary"
@@ -1563,7 +1616,7 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
                   loading={isSubmitting}
                   icon={<CheckCircle className="w-4 h-4" />}
                   iconPosition="right"
-                  className="shadow-lg"
+                  className="shadow-lg w-full sm:w-auto"
                   disabled={isSubmitting}
                 >
                   Create Account
@@ -1575,6 +1628,7 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
                   icon={<ArrowRight className="w-4 h-4" />}
                   iconPosition="right"
                   disabled={isSubmitting}
+                  className="w-full sm:w-auto"
                 >
                   Continue
                 </Button>

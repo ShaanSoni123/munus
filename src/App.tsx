@@ -10,12 +10,13 @@ import { JobSeekerDashboard } from './components/jobs/JobSeekerDashboard';
 import { ResumeBuilder } from './components/resume/ResumeBuilder';
 import { EmployerDashboard } from './components/employer/EmployerDashboard';
 import { JobPostingBuilder } from './components/employer/JobPostingBuilder';
+import { ApplicationDetailPage } from './components/employer/ApplicationDetailPage';
 import { AuthModal } from './components/auth/AuthModal';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { ToastContainer, useToast } from './components/common/Toast';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { ConnectionStatus } from './components/common/ConnectionStatus';
+// import { ConnectionStatus } from './components/common/ConnectionStatus';
 import { AuthProvider } from './contexts/AuthContext';
 import { JobProvider } from './contexts/JobContext';
 import { useAuth } from './contexts/AuthContext';
@@ -29,63 +30,60 @@ import { AIChatbot } from './components/common/AIChatbot';
 
 const AppContent: React.FC = () => {
   console.log('🚀 AppContent component rendering...'); // DEBUG LINE - ADDED
-  const [currentView, setCurrentView] = useState<'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications'>('home');
+  
+  const [currentView, setCurrentView] = useState<'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail'>('home');
   
   // Wrapper function to log navigation changes
-  const handleNavigate = (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications') => {
+  const handleNavigate = (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail') => {
     console.log('🔄 Navigation requested:', { from: currentView, to: view });
     setCurrentView(view);
   };
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
   const [dashboardKey, setDashboardKey] = useState(0); // Key to force dashboard refresh
+  const [selectedApplication, setSelectedApplication] = useState<any>(null); // Track selected application for detail page
   const { isAuthenticated, isEmployer, isJobSeeker, user, loading } = useAuth();
   const { theme } = useTheme();
   const { toasts, removeToast } = useToast();
 
   // Navigation logic is now handled in the useEffect below
 
-  // Handle authentication state changes - only redirect when necessary
+  // Handle authentication state changes
   useEffect(() => {
     if (loading) return;
 
-    // If not authenticated, only allow home or create-profile
-    if (!isAuthenticated && !['home', 'create-profile'].includes(currentView)) {
-      console.log('❌ User not authenticated, redirecting from', currentView, 'to home');
-      setCurrentView('home');
-      return;
-    }
+    console.log('🔄 Auth state check:', { 
+      isAuthenticated, 
+      currentView, 
+      user: user?.email,
+      userRole: user?.role,
+      loading 
+    });
 
-    // If authenticated, only redirect if on home or create-profile (initial login redirect)
-    if (isAuthenticated && ['home', 'create-profile'].includes(currentView)) {
-      console.log('✅ User authenticated, redirecting from', currentView, 'to dashboard');
+    // If authenticated and on home page or public pages, go to dashboard
+    if (isAuthenticated && user && ['home', 'jobs', 'faqs', 'contact'].includes(currentView)) {
+      console.log('✅ User authenticated, redirecting to dashboard');
+      setDashboardKey(prev => prev + 1);
       setCurrentView('dashboard');
-      return;
     }
-
-    // Otherwise, allow the user to stay on their current page
-    console.log('🔄 Navigation allowed, staying on', currentView);
-  }, [isAuthenticated, isEmployer, isJobSeeker, loading, currentView]);
-
-  // Reset to home page when user logs out
-  useEffect(() => {
-    if (!isAuthenticated && currentView !== 'home' && currentView !== 'create-profile') {
-      console.log('🚪 User logged out, redirecting to home');
+    
+    // If not authenticated and on protected page, go home
+    if (!isAuthenticated && ['dashboard', 'post-job', 'candidates', 'profile', 'settings', 'notifications'].includes(currentView)) {
+      console.log('❌ User not authenticated, going home');
       setCurrentView('home');
     }
-  }, [isAuthenticated, currentView]);
+  }, [isAuthenticated, user, loading, currentView]);
 
   const handleGetStarted = () => {
     console.log('🚀 handleGetStarted called', {
       isAuthenticated,
-      isEmployer,
-      isJobSeeker,
       user: user?.role
     });
     
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
       // User is already authenticated, redirect to dashboard
       console.log('✅ User authenticated, redirecting to dashboard');
+      setDashboardKey(prev => prev + 1);
       setCurrentView('dashboard');
     } else {
       // User is not authenticated, go to profile creation
@@ -101,19 +99,24 @@ const AppContent: React.FC = () => {
 
   const handleProfileCreationComplete = () => {
     console.log('🎉 Profile creation completed!');
-    // The useEffect will handle the redirect automatically
-    // Just ensure we're not on the create-profile view anymore
-    if (currentView === 'create-profile') {
-      setCurrentView('home');
-    }
+    // Force refresh dashboard and redirect to dashboard immediately
+    setDashboardKey(prev => prev + 1);
+    setCurrentView('dashboard');
   };
 
   const handleProfileCreationBack = () => {
     setCurrentView('home');
   };
 
-  const handleFindJobs = () => setCurrentView('jobs');
-  const handleResumeBuilder = () => setCurrentView('resume');
+  const handleFindJobs = () => {
+    console.log('🔍 App: Find Jobs clicked');
+    setCurrentView('jobs');
+  };
+  
+  const handleResumeBuilder = () => {
+    console.log('📝 App: Resume Builder clicked');
+    setCurrentView('resume');
+  };
 
   // Show loading spinner during initial auth check
   if (loading) {
@@ -167,18 +170,19 @@ const AppContent: React.FC = () => {
         case 'resume':
           return <ResumeBuilder />;
         case 'dashboard':
-          if (isEmployer) {
-            return <EmployerDashboard key={dashboardKey} onNavigate={handleNavigate} />;
-          } else if (isJobSeeker) {
+          console.log('🎯 Rendering dashboard for user:', { role: user?.role, isEmployer, isJobSeeker });
+          
+          // Primary check: use user.role directly from database
+          if (user?.role === 'employer') {
+            return <EmployerDashboard key={dashboardKey} onNavigate={handleNavigate} onApplicationSelect={setSelectedApplication} />;
+          } else if (user?.role === 'jobseeker') {
             return <JobSeekerDashboard onNavigate={handleNavigate} />;
           } else {
-            // Fallback: try to determine role from user object
-            if (user?.role === 'employer') {
-              return <EmployerDashboard key={dashboardKey} onNavigate={handleNavigate} />;
-            } else if (user?.role === 'jobseeker') {
-              return <JobSeekerDashboard onNavigate={handleNavigate} />;
+            // Fallback: use computed properties
+            if (isEmployer) {
+              return <EmployerDashboard key={dashboardKey} onNavigate={handleNavigate} onApplicationSelect={setSelectedApplication} />;
             } else {
-              // Last resort: show job seeker dashboard
+              // Default to job seeker dashboard
               return <JobSeekerDashboard onNavigate={handleNavigate} />;
             }
           }
@@ -222,6 +226,21 @@ const AppContent: React.FC = () => {
           return <SettingsPage onNavigate={handleNavigate} />;
         case 'notifications':
           return <NotificationsPage onNavigate={handleNavigate} />;
+        case 'application-detail':
+          if (selectedApplication) {
+            return (
+              <ApplicationDetailPage
+                application={selectedApplication}
+                onBack={() => setCurrentView('dashboard')}
+                onStatusUpdate={(applicationId, status, notes) => {
+                  // Handle status update - could be passed down from dashboard
+                  console.log('Status update:', { applicationId, status, notes });
+                }}
+              />
+            );
+          }
+          // Fallback to dashboard if no application selected
+          return <EmployerDashboard key={dashboardKey} onNavigate={handleNavigate} />;
         default:
           return <HomePage onGetStarted={handleGetStarted} onSignIn={handleSignIn} onFindJobs={handleFindJobs} onResumeBuilder={handleResumeBuilder} />;
       }
@@ -289,7 +308,6 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <JobProvider>
-            <ConnectionStatus />
             <AppContent />
           </JobProvider>
         </AuthProvider>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, Share2, Edit, Eye } from 'lucide-react';
+import { Download, Edit, Loader2 } from 'lucide-react';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { Badge } from '../../ui/Badge';
@@ -7,9 +7,11 @@ import type { Resume } from '../../../types';
 
 interface PreviewStepProps {
   resumeData: Partial<Resume>;
+  onDownloadPDF?: () => void;
+  isGeneratingPDF?: boolean;
 }
 
-export const PreviewStep: React.FC<PreviewStepProps> = ({ resumeData }) => {
+export const PreviewStep: React.FC<PreviewStepProps> = ({ resumeData, onDownloadPDF, isGeneratingPDF }) => {
   const { personalInfo, experience, education, skills, videoUrl } = resumeData;
 
   const formatDate = (date: Date | undefined) => {
@@ -23,26 +25,7 @@ export const PreviewStep: React.FC<PreviewStepProps> = ({ resumeData }) => {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           Resume Preview
         </h3>
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            icon={<Edit className="w-4 h-4" />}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="outline"
-            icon={<Share2 className="w-4 h-4" />}
-          >
-            Share
-          </Button>
-          <Button
-            variant="primary"
-            icon={<Download className="w-4 h-4" />}
-          >
-            Download PDF
-          </Button>
-        </div>
+        {/* Buttons removed from header - only in bottom section now */}
       </div>
 
       {/* Resume Content */}
@@ -200,28 +183,25 @@ export const PreviewStep: React.FC<PreviewStepProps> = ({ resumeData }) => {
         )}
       </Card>
 
-      {/* Action Buttons */}
-      <div className="flex justify-center space-x-4">
+      {/* Action Buttons - Mobile Friendly */}
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 py-6 px-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-xl border border-blue-100 dark:border-gray-600">
         <Button
-          variant="outline"
+          variant="primary"
           size="lg"
-          icon={<Eye className="w-5 h-5" />}
+          icon={isGeneratingPDF ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+          onClick={onDownloadPDF}
+          disabled={isGeneratingPDF}
+          className="w-full sm:w-auto px-6 py-3 font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
         >
-          Preview in New Tab
+          {isGeneratingPDF ? 'Generating...' : 'Download PDF'}
         </Button>
         <Button
           variant="secondary"
           size="lg"
-          icon={<Share2 className="w-5 h-5" />}
+          icon={<Edit className="w-4 h-4" />}
+          className="w-full sm:w-auto px-6 py-3 font-semibold shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
         >
-          Share Resume
-        </Button>
-        <Button
-          variant="primary"
-          size="lg"
-          icon={<Download className="w-5 h-5" />}
-        >
-          Download PDF
+          Save Resume
         </Button>
       </div>
     </div>

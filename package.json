@@ -12,7 +12,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.3",
     "axios": "^1.10.0",
     "country-state-city": "^3.2.1",
     "lucide-react": "^0.344.0",

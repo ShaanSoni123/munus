@@ -7,23 +7,46 @@ export const ConnectionStatus: React.FC = () => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
 
   const isEmployer = user?.role === 'employer';
   const isJobSeeker = user?.role === 'job_seeker';
 
-  const checkConnection = async () => {
+  const checkConnection = async (retryCount = 0) => {
     setIsChecking(true);
     try {
-      // Check if the backend is accessible
-      const response = await fetch('/api/v1/health', {
+      // Use the correct API base URL from environment or default
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+      const healthUrl = `${API_BASE_URL}/health`;
+      
+      console.log('Checking connection to:', healthUrl);
+      
+      const response = await fetch(healthUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
+        // Add timeout to prevent hanging
+        signal: AbortSignal.timeout(8000), // 8 second timeout
       });
-      setIsConnected(response.ok);
-    } catch (error) {
+      
+      console.log('Health check response:', response.status, response.ok);
+      
+      if (response.ok) {
+        setIsConnected(true);
+      } else {
+        throw new Error(`HTTP ${response.status}`);
+      }
+    } catch (error: any) {
+      console.error('Connection check failed:', error);
+      
+      // Retry logic for initial connection attempts
+      if (retryCount < 2 && (error.name === 'TypeError' || error.message?.includes('Failed to fetch'))) {
+        console.log(`Retrying connection check... (${retryCount + 1}/3)`);
+        setTimeout(() => checkConnection(retryCount + 1), 2000);
+        return;
+      }
+      
       setIsConnected(false);
     } finally {
       setIsChecking(false);
@@ -31,10 +54,16 @@ export const ConnectionStatus: React.FC = () => {
   };
 
   useEffect(() => {
-    checkConnection();
-    // Check connection every 30 seconds
-    const interval = setInterval(checkConnection, 30000);
-    return () => clearInterval(interval);
+    // Delay initial check to give backend time to start
+    const initialTimeout = setTimeout(checkConnection, 5000); // Increased delay
+    
+    // Check connection every 5 minutes (reduced frequency)
+    const interval = setInterval(checkConnection, 300000);
+    
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
   }, []);
 
   // Debug panel for development

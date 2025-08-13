@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # OpenAI / Twilio
-    OPENAI_API_KEY: Optional[str] = None
+    OPENAI_API_KEY: Optional[str] = "your-openai-api-key-here"
     TWILIO_ACCOUNT_SID: Optional[str] = None
     TWILIO_AUTH_TOKEN: Optional[str] = None
     TWILIO_VERIFY_SID: Optional[str] = None
@@ -60,7 +60,7 @@ class Settings(BaseSettings):
     OTP_EXPIRY_MINUTES: int = 5
 
     # MongoDB
-    MONGODB_URI: str = "mongodb://localhost:27017"
+    MONGODB_URI: str = "mongodb+srv://shaansoni21:L7H0k0nER4DjEM1D@munusdb.f8c3gzf.mongodb.net/?retryWrites=true&w=majority&appName=Munusdb"
     MONGODB_DB_NAME: str = "jobify"
 
     # ✅ This is what makes .env auto-load

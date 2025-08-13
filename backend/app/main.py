@@ -42,17 +42,11 @@ auth_token = os.getenv("TWILIO_AUTH_TOKEN", "")
 verify_sid = os.getenv("TWILIO_VERIFY_SID", "")
 client = Client(account_sid, auth_token)
 
-# CORS middleware
+# CORS middleware - FIXED FOR DEVELOPMENT
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "*"  # Allow all for development
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],  # Allow all origins for development
+    allow_credentials=False,  # Set to False when using wildcard
     allow_methods=["*"],
     allow_headers=["*"],
 )

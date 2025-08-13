@@ -80,6 +80,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initializeAuth();
+    
+    // Listen for localStorage changes and force auth refresh
+    const handleStorageChange = (e) => {
+      if (e.key === 'skillglide-user' || e.key === 'skillglide-access-token') {
+        console.log('🔄 Storage change detected, reinitializing auth...');
+        setTimeout(initializeAuth, 100);
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Also listen for custom auth events
+    const handleAuthEvent = () => {
+      console.log('🔄 Custom auth event detected, reinitializing...');
+      setTimeout(initializeAuth, 100);
+    };
+    
+    window.addEventListener('auth-state-changed', handleAuthEvent);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('auth-state-changed', handleAuthEvent);
+    };
   }, []);
 
   const login = async (email: string, password: string, role: 'jobseeker' | 'employer') => {
@@ -89,17 +112,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.login(email, password, role);
       console.log('✅ Login response received', { user: response.user });
       
-      // Set user immediately
-      setUser(response.user);
-      console.log('👤 User state set to:', response.user);
+      // Set user immediately with proper structure
+      const userObj = {
+        ...response.user,
+        id: response.user._id || response.user.id,
+        role: response.user.role
+      };
       
-      // Verify the user was stored correctly
-      const storedUser = authService.getCurrentUser();
-      console.log('🔄 Verifying stored user:', storedUser);
+      setUser(userObj);
+      console.log('👤 User state set to:', userObj);
       
-      if (!storedUser) {
-        console.warn('⚠️ User not found in localStorage after login');
-      }
     } catch (error) {
       console.error('❌ Login error:', error);
       throw error;
@@ -115,17 +137,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authService.register(userData);
       console.log('✅ Registration response received:', response);
       
-      // Set user immediately
-      setUser(response.user);
-      console.log('👤 User state set to:', response.user);
+      // Set user immediately with proper structure
+      const userObj = {
+        ...response.user,
+        id: response.user._id || response.user.id,
+        role: response.user.role
+      };
       
-      // Verify the user was stored correctly
-      const storedUser = authService.getCurrentUser();
-      console.log('🔄 Verifying stored user:', storedUser);
+      setUser(userObj);
+      console.log('👤 User state set to:', userObj);
       
-      if (!storedUser) {
-        console.warn('⚠️ User not found in localStorage after registration');
-      }
     } catch (error) {
       console.error('❌ Registration error:', error);
       throw error;

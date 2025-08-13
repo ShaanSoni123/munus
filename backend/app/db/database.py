@@ -4,8 +4,8 @@ from typing import Generator
 from app.core.config import settings
 
 # MongoDB connection settings
-MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
-MONGODB_DB_NAME = os.getenv("MONGODB_DB_NAME", "jobify")
+MONGODB_URI = settings.MONGODB_URI
+MONGODB_DB_NAME = settings.MONGODB_DB_NAME
 
 # MongoDB async client
 client = AsyncIOMotorClient(MONGODB_URI)

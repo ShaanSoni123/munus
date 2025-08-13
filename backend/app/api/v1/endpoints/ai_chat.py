@@ -25,9 +25,10 @@ async def chat_with_ai(
     current_user: User = Depends(get_current_user)
 ):
     try:
-        # Get OpenAI API key from environment
-        api_key = os.getenv("VITE_OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
-        if not api_key:
+        # Get OpenAI API key from settings
+        from app.core.config import settings
+        api_key = settings.OPENAI_API_KEY
+        if not api_key or api_key == "your-openai-api-key-here":
             raise HTTPException(status_code=500, detail="OpenAI API key not configured")
         
         # Prepare the request to OpenAI
@@ -42,7 +43,7 @@ async def chat_with_ai(
             "messages": [
                 {
                     "role": "system",
-                    "content": "You are Opusnex AI, a helpful and friendly career assistant for job seekers. You help users with resume building, interview preparation, job search strategies, salary negotiation, application guidance, and general career advice. Always introduce yourself as 'Opusnex AI' and be encouraging, professional, and supportive. Keep responses concise but helpful."
+                    "content": "You are MunusAI, a helpful and friendly career assistant created by Munus for job seekers. You help users with resume building, interview preparation, job search strategies, salary negotiation, application guidance, and general career advice. When asked about yourself, mention that you are MunusAI made by Munus. Always be encouraging, professional, and supportive. Keep responses concise but helpful."
                 }
             ] + [{"role": msg.role, "content": msg.content} for msg in request.messages],
             "max_tokens": 500,

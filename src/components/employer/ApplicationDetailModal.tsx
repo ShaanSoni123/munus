@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Mail, Phone, MapPin, Clock, Calendar, Globe, Github, Linkedin, FileText, Star, Award, Languages, Briefcase, CheckCircle, XCircle, Clock3, AlertCircle, CalendarDays, Users } from 'lucide-react';
+import { X, User, Mail, Phone, MapPin, Clock, Calendar, Globe, Github, Linkedin, FileText, Star, Award, Languages, Briefcase, CheckCircle, XCircle, Clock3, AlertCircle, CalendarDays, Users, Eye } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -37,6 +37,7 @@ interface ApplicationDetailModalProps {
   onClose: () => void;
   onStatusUpdate: (applicationId: string, status: string, notes?: string) => void;
   isUpdating?: boolean;
+  onViewFullPage?: (application: Application) => void; // New prop for page navigation
 }
 
 export const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
@@ -44,7 +45,8 @@ export const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
   isOpen,
   onClose,
   onStatusUpdate,
-  isUpdating = false
+  isUpdating = false,
+  onViewFullPage
 }) => {
   const { theme } = useTheme();
   const [notes, setNotes] = useState('');
@@ -107,383 +109,408 @@ export const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
     }
   };
 
+  // Theme-aware background colors
+  const modalBg = theme === 'light' ? 'bg-gray-50/95 backdrop-blur-sm' : 'bg-gray-800';
+  const headerBg = theme === 'light' ? 'bg-gray-100/80 backdrop-blur-sm border-gray-200' : 'bg-gray-700/80 backdrop-blur-sm border-gray-600';
+  const contentBg = theme === 'light' ? 'bg-white/90 backdrop-blur-sm' : 'bg-gray-800/90 backdrop-blur-sm';
+  const cardBg = theme === 'light' ? 'bg-gray-50/80 border-gray-200' : 'bg-gray-700/80 border-gray-600';
+  const footerBg = theme === 'light' ? 'bg-gray-100/80 backdrop-blur-sm border-gray-200' : 'bg-gray-700/80 backdrop-blur-sm border-gray-600';
+
   return (
     <>
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
-        {/* Header - Light Theme */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <User className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">
-                  {application.applicant_name || 'Job Applicant'}
-                </h2>
-                <p className="text-gray-500 text-sm">
-                  Applied {new Date(application.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Badge className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(application.status)}`}>
-                {getStatusIcon(application.status)}
-                <span className="ml-1 capitalize">{application.status.replace('_', ' ')}</span>
-              </Badge>
-              <button
-                onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            {/* Left Column - Contact & Professional Info */}
-            <div className="xl:col-span-1 space-y-4">
-              {/* Contact Information */}
-              {(application.applicant_email || application.linkedin_url || application.github_url || application.portfolio_url) && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                    <Mail className="w-5 h-5 mr-2 text-blue-600" />
-                    Contact Information
-                  </h3>
-                  <div className="space-y-2">
-                    {application.applicant_email && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Mail className="w-4 h-4 mr-2 text-gray-400" />
-                        <a href={`mailto:${application.applicant_email}`} className="hover:text-blue-600 hover:underline">
-                          {application.applicant_email}
-                        </a>
-                      </div>
-                    )}
-                    {application.linkedin_url && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Linkedin className="w-4 h-4 mr-2 text-gray-400" />
-                        <a href={application.linkedin_url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 hover:underline">
-                          LinkedIn Profile
-                        </a>
-                      </div>
-                    )}
-                    {application.github_url && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Github className="w-4 h-4 mr-2 text-gray-400" />
-                        <a href={application.github_url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 hover:underline">
-                          GitHub Profile
-                        </a>
-                      </div>
-                    )}
-                    {application.portfolio_url && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Globe className="w-4 h-4 mr-2 text-gray-400" />
-                        <a href={application.portfolio_url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 hover:underline">
-                          Portfolio Website
-                        </a>
-                      </div>
-                    )}
-                  </div>
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className={`${modalBg} rounded-xl shadow-2xl w-full max-w-5xl max-h-[95vh] overflow-hidden flex flex-col border border-gray-200/50 dark:border-gray-600/50`}>
+          {/* Header - Theme Aware */}
+          <div className={`${headerBg} px-6 py-4`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className={`w-12 h-12 ${theme === 'light' ? 'bg-blue-100' : 'bg-blue-900/30'} rounded-full flex items-center justify-center`}>
+                  <User className={`w-6 h-6 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
                 </div>
-              )}
-
-              {/* Professional Details - Only show if has content */}
-              {(application.years_of_experience || application.relevant_skills || application.work_authorization || application.notice_period) && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                    <Briefcase className="w-5 h-5 mr-2 text-blue-600" />
-                    Professional Details
-                  </h3>
-                  <div className="space-y-3">
-                    {application.years_of_experience && (
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Experience:</span>
-                        <p className="text-sm text-gray-600">{application.years_of_experience} years</p>
-                      </div>
-                    )}
-                    {application.relevant_skills && (
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Skills:</span>
-                        <p className="text-sm text-gray-600">{application.relevant_skills}</p>
-                      </div>
-                    )}
-                    {application.work_authorization && (
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Work Authorization:</span>
-                        <p className="text-sm text-gray-600">{application.work_authorization}</p>
-                      </div>
-                    )}
-                    {application.notice_period && (
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Notice Period:</span>
-                        <p className="text-sm text-gray-600">{application.notice_period}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Work Preferences - Only show if has content */}
-              {(application.remote_work_preference || application.relocation_willingness || application.availability_start_date || application.additional_languages) && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                    <MapPin className="w-5 h-5 mr-2 text-blue-600" />
-                    Work Preferences
-                  </h3>
-                  <div className="space-y-3">
-                    {application.remote_work_preference && (
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Remote Work:</span>
-                        <p className="text-sm text-gray-600">{application.remote_work_preference}</p>
-                      </div>
-                    )}
-                    {application.relocation_willingness && (
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Relocation:</span>
-                        <p className="text-sm text-gray-600">{application.relocation_willingness}</p>
-                      </div>
-                    )}
-                    {application.availability_start_date && (
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Available From:</span>
-                        <p className="text-sm text-gray-600">{new Date(application.availability_start_date).toLocaleDateString()}</p>
-                      </div>
-                    )}
-                    {application.additional_languages && (
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Languages:</span>
-                        <p className="text-sm text-gray-600">{application.additional_languages}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Right Column - Application Details */}
-            <div className="xl:col-span-2 space-y-4">
-              {/* Cover Letter */}
-              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                  <FileText className="w-5 h-5 mr-2 text-blue-600" />
-                  Cover Letter
-                </h3>
-                <div className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">
-                  {application.cover_letter || 'No cover letter provided.'}
+                <div>
+                  <h2 className={`text-xl font-bold ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                    {application.applicant_name || 'Job Applicant'}
+                  </h2>
+                  <p className={`text-sm ${theme === 'light' ? 'text-gray-500' : 'text-gray-400'}`}>
+                    Applied {new Date(application.created_at).toLocaleDateString()}
+                  </p>
                 </div>
               </div>
-
-              {/* Why Interested */}
-              {application.why_interested && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                    <Star className="w-5 h-5 mr-2 text-blue-600" />
-                    Why Interested
-                  </h3>
-                  <div className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">
-                    {application.why_interested}
-                  </div>
-                </div>
-              )}
-
-              {/* Biggest Achievement */}
-              {application.biggest_achievement && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                    <Award className="w-5 h-5 mr-2 text-blue-600" />
-                    Key Achievement
-                  </h3>
-                  <div className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">
-                    {application.biggest_achievement}
-                  </div>
-                </div>
-              )}
-
-              {/* Resume */}
-              {application.resume_url && (
-                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
-                    <FileText className="w-5 h-5 mr-2 text-blue-600" />
-                    Resume
-                  </h3>
+              <div className="flex items-center space-x-3">
+                <Badge className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(application.status)}`}>
+                  {getStatusIcon(application.status)}
+                  <span className="ml-1 capitalize">{application.status.replace('_', ' ')}</span>
+                </Badge>
+                
+                {/* View Full Page Button */}
+                {onViewFullPage && (
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.open(application.resume_url, '_blank')}
-                    className="w-full"
+                    onClick={() => onViewFullPage(application)}
+                    className={`${theme === 'light' ? 'border-blue-300 text-blue-600 hover:bg-blue-50' : 'border-blue-600 text-blue-400 hover:bg-blue-900/20'}`}
                   >
-                    <FileText className="w-4 h-4 mr-2" />
-                    View Resume
-                  </Button>
-                </div>
-              )}
-
-              {/* Employer Notes */}
-              {application.employer_notes && (
-                <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                    Internal Notes
-                  </h3>
-                  <div className="text-sm text-gray-600 whitespace-pre-wrap leading-relaxed">
-                    {application.employer_notes}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Footer - Action Buttons */}
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
-          <div className="flex flex-col space-y-4">
-            {/* Notes Input */}
-            {showNotesInput && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Add Notes (Optional)
-                </label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Add internal notes about this application..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
-                  rows={3}
-                />
-              </div>
-            )}
-
-            {/* Action Buttons - Better organized */}
-            <div className="flex flex-col space-y-3">
-              {/* Primary Actions */}
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={handleScheduleInterview}
-                  disabled={isUpdating}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <CalendarDays className="w-4 h-4 mr-2" />
-                  Schedule Interview
-                </Button>
-
-                {application.status !== 'shortlisted' && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleShortlistForInterview}
-                    disabled={isUpdating}
-                    className="border-purple-300 text-purple-600 hover:bg-purple-50"
-                  >
-                    {isUpdating ? (
-                      <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
-                    ) : (
-                      <Users className="w-4 h-4 mr-2" />
-                    )}
-                    Shortlisted for Interview
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Full Page
                   </Button>
                 )}
+                
+                <button
+                  onClick={onClose}
+                  className={`${theme === 'light' ? 'text-gray-400 hover:text-gray-600 hover:bg-gray-100' : 'text-gray-400 hover:text-gray-300 hover:bg-gray-600'} transition-colors p-2 rounded-full`}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
 
-                {application.status !== 'accepted' && (
+          {/* Content - Scrollable */}
+          <div className={`flex-1 overflow-y-auto p-6 ${contentBg}`}>
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+              {/* Left Column - Contact & Professional Info */}
+              <div className="xl:col-span-1 space-y-4">
+                {/* Contact Information */}
+                {(application.applicant_email || application.linkedin_url || application.github_url || application.portfolio_url) && (
+                  <div className={`${cardBg} rounded-lg p-4 border`}>
+                    <h3 className={`text-lg font-semibold mb-3 flex items-center ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                      <Mail className={`w-5 h-5 mr-2 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
+                      Contact Information
+                    </h3>
+                    <div className="space-y-2">
+                      {application.applicant_email && (
+                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                          <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                          <a href={`mailto:${application.applicant_email}`} className="hover:text-blue-600 hover:underline">
+                            {application.applicant_email}
+                          </a>
+                        </div>
+                      )}
+                      {application.linkedin_url && (
+                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                          <Linkedin className="w-4 h-4 mr-2 text-gray-400" />
+                          <a href={application.linkedin_url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 hover:underline">
+                            LinkedIn Profile
+                          </a>
+                        </div>
+                      )}
+                      {application.github_url && (
+                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                          <Github className="w-4 h-4 mr-2 text-gray-400" />
+                          <a href={application.github_url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 hover:underline">
+                            GitHub Profile
+                          </a>
+                        </div>
+                      )}
+                      {application.portfolio_url && (
+                        <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                          <Globe className="w-4 h-4 mr-2 text-gray-400" />
+                          <a href={application.portfolio_url} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 hover:underline">
+                            Portfolio Website
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Professional Details - Only show if has content */}
+                {(application.years_of_experience || application.relevant_skills || application.work_authorization || application.notice_period) && (
+                  <div className={`${cardBg} rounded-lg p-4 border`}>
+                    <h3 className={`text-lg font-semibold mb-3 flex items-center ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                      <Briefcase className={`w-5 h-5 mr-2 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
+                      Professional Details
+                    </h3>
+                    <div className="space-y-3">
+                      {application.years_of_experience && (
+                        <div>
+                          <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Experience:</span>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{application.years_of_experience} years</p>
+                        </div>
+                      )}
+                      {application.relevant_skills && (
+                        <div>
+                          <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Skills:</span>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{application.relevant_skills}</p>
+                        </div>
+                      )}
+                      {application.work_authorization && (
+                        <div>
+                          <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Work Authorization:</span>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{application.work_authorization}</p>
+                        </div>
+                      )}
+                      {application.notice_period && (
+                        <div>
+                          <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Notice Period:</span>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{application.notice_period}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Work Preferences - Only show if has content */}
+                {(application.remote_work_preference || application.relocation_willingness || application.availability_start_date || application.additional_languages) && (
+                  <div className={`${cardBg} rounded-lg p-4 border`}>
+                    <h3 className={`text-lg font-semibold mb-3 flex items-center ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                      <MapPin className={`w-5 h-5 mr-2 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
+                      Work Preferences
+                    </h3>
+                    <div className="space-y-3">
+                      {application.remote_work_preference && (
+                        <div>
+                          <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Remote Work:</span>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{application.remote_work_preference}</p>
+                        </div>
+                      )}
+                      {application.relocation_willingness && (
+                        <div>
+                          <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Relocation:</span>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{application.relocation_willingness}</p>
+                        </div>
+                      )}
+                      {application.availability_start_date && (
+                        <div>
+                          <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Available From:</span>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{new Date(application.availability_start_date).toLocaleDateString()}</p>
+                        </div>
+                      )}
+                      {application.additional_languages && (
+                        <div>
+                          <span className={`text-sm font-medium ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>Languages:</span>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{application.additional_languages}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column - Application Details */}
+              <div className="xl:col-span-2 space-y-4">
+                {/* Cover Letter */}
+                <div className={`${cardBg} rounded-lg p-4 border`}>
+                  <h3 className={`text-lg font-semibold mb-3 flex items-center ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                    <FileText className={`w-5 h-5 mr-2 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
+                    Cover Letter
+                  </h3>
+                  <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">
+                    {application.cover_letter || 'No cover letter provided.'}
+                  </div>
+                </div>
+
+                {/* Why Interested */}
+                {application.why_interested && (
+                  <div className={`${cardBg} rounded-lg p-4 border`}>
+                    <h3 className={`text-lg font-semibold mb-3 flex items-center ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                      <Star className={`w-5 h-5 mr-2 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
+                      Why Interested
+                    </h3>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">
+                      {application.why_interested}
+                    </div>
+                  </div>
+                )}
+
+                {/* Biggest Achievement */}
+                {application.biggest_achievement && (
+                  <div className={`${cardBg} rounded-lg p-4 border`}>
+                    <h3 className={`text-lg font-semibold mb-3 flex items-center ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                      <Award className={`w-5 h-5 mr-2 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
+                      Key Achievement
+                    </h3>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">
+                      {application.biggest_achievement}
+                    </div>
+                  </div>
+                )}
+
+                {/* Resume */}
+                {application.resume_url && (
+                  <div className={`${cardBg} rounded-lg p-4 border`}>
+                    <h3 className={`text-lg font-semibold mb-3 flex items-center ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                      <FileText className={`w-5 h-5 mr-2 ${theme === 'light' ? 'text-blue-600' : 'text-blue-400'}`} />
+                      Resume
+                    </h3>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(application.resume_url, '_blank')}
+                      className="w-full"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      View Resume
+                    </Button>
+                  </div>
+                )}
+
+                {/* Employer Notes */}
+                {application.employer_notes && (
+                  <div className={`${theme === 'light' ? 'bg-yellow-50/80 border-yellow-200' : 'bg-yellow-900/20 border-yellow-800'} rounded-lg p-4 border`}>
+                    <h3 className={`text-lg font-semibold mb-3 ${theme === 'light' ? 'text-gray-900' : 'text-white'}`}>
+                      Internal Notes
+                    </h3>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap leading-relaxed">
+                      {application.employer_notes}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Footer - Action Buttons */}
+          <div className={`${footerBg} px-6 py-4 border-t`}>
+            <div className="flex flex-col space-y-4">
+              {/* Notes Input */}
+              {showNotesInput && (
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${theme === 'light' ? 'text-gray-700' : 'text-gray-300'}`}>
+                    Add Notes (Optional)
+                  </label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Add internal notes about this application..."
+                    className={`w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm resize-none ${
+                      theme === 'light' 
+                        ? 'border-gray-300 bg-white text-gray-900' 
+                        : 'border-gray-600 bg-gray-700 text-white'
+                    }`}
+                    rows={3}
+                  />
+                </div>
+              )}
+
+              {/* Action Buttons - Better organized */}
+              <div className="flex flex-col space-y-3">
+                {/* Primary Actions */}
+                <div className="flex flex-wrap gap-2">
                   <Button
                     variant="primary"
                     size="sm"
-                    onClick={() => handleStatusUpdate('accepted')}
+                    onClick={handleScheduleInterview}
                     disabled={isUpdating}
-                    className="bg-green-600 hover:bg-green-700 text-white"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    {isUpdating ? (
-                      <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
-                    ) : (
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                    )}
-                    Accept
+                    <CalendarDays className="w-4 h-4 mr-2" />
+                    Schedule Interview
                   </Button>
-                )}
-              </div>
 
-              {/* Secondary Actions */}
-              <div className="flex flex-wrap gap-2">
-                {application.status !== 'rejected' && (
+                  {application.status !== 'shortlisted' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleShortlistForInterview}
+                      disabled={isUpdating}
+                      className="border-purple-300 text-purple-600 hover:bg-purple-50"
+                    >
+                      {isUpdating ? (
+                        <div className="animate-spin w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full mr-2" />
+                      ) : (
+                        <Users className="w-4 h-4 mr-2" />
+                      )}
+                      Shortlisted for Interview
+                    </Button>
+                  )}
+
+                  {application.status !== 'accepted' && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleStatusUpdate('accepted')}
+                      disabled={isUpdating}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      {isUpdating ? (
+                        <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                      ) : (
+                        <CheckCircle className="w-4 h-4 mr-2" />
+                      )}
+                      Accept
+                    </Button>
+                  )}
+                </div>
+
+                {/* Secondary Actions */}
+                <div className="flex flex-wrap gap-2">
+                  {application.status !== 'rejected' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleStatusUpdate('rejected')}
+                      disabled={isUpdating}
+                      className="border-red-300 text-red-600 hover:bg-red-50"
+                    >
+                      {isUpdating ? (
+                        <div className="animate-spin w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full mr-2" />
+                      ) : (
+                        <XCircle className="w-4 h-4 mr-2" />
+                      )}
+                      Reject
+                    </Button>
+                  )}
+
+                  {application.status !== 'waiting' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleStatusUpdate('waiting')}
+                      disabled={isUpdating}
+                      className="border-yellow-300 text-yellow-600 hover:bg-yellow-50"
+                    >
+                      {isUpdating ? (
+                        <div className="animate-spin w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full mr-2" />
+                      ) : (
+                        <Clock3 className="w-4 h-4 mr-2" />
+                      )}
+                      Waiting List
+                    </Button>
+                  )}
+
+                  {application.status !== 'under_review' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleStatusUpdate('under_review')}
+                      disabled={isUpdating}
+                      className="border-blue-300 text-blue-600 hover:bg-blue-50"
+                    >
+                      {isUpdating ? (
+                        <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 mr-2" />
+                      )}
+                      Under Review
+                    </Button>
+                  )}
+                </div>
+
+                {/* Utility Actions */}
+                <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-600">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleStatusUpdate('rejected')}
-                    disabled={isUpdating}
-                    className="border-red-300 text-red-600 hover:bg-red-50"
+                    onClick={() => setShowNotesInput(!showNotesInput)}
+                    className={`${theme === 'light' ? 'text-gray-600 hover:text-gray-800' : 'text-gray-400 hover:text-gray-200'}`}
                   >
-                    {isUpdating ? (
-                      <div className="animate-spin w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full mr-2" />
-                    ) : (
-                      <XCircle className="w-4 h-4 mr-2" />
-                    )}
-                    Reject
+                    {showNotesInput ? 'Hide Notes' : 'Add Notes'}
                   </Button>
-                )}
-
-                {application.status !== 'waiting' && (
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleStatusUpdate('waiting')}
-                    disabled={isUpdating}
-                    className="border-yellow-300 text-yellow-600 hover:bg-yellow-50"
+                    onClick={onClose}
+                    className={`${theme === 'light' ? 'text-gray-600 hover:text-gray-800' : 'text-gray-400 hover:text-gray-200'}`}
                   >
-                    {isUpdating ? (
-                      <div className="animate-spin w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full mr-2" />
-                    ) : (
-                      <Clock3 className="w-4 h-4 mr-2" />
-                    )}
-                    Waiting List
+                    Close
                   </Button>
-                )}
-
-                {application.status !== 'under_review' && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleStatusUpdate('under_review')}
-                    disabled={isUpdating}
-                    className="border-blue-300 text-blue-600 hover:bg-blue-50"
-                  >
-                    {isUpdating ? (
-                      <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 mr-2" />
-                    )}
-                    Under Review
-                  </Button>
-                )}
-              </div>
-
-              {/* Utility Actions */}
-              <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowNotesInput(!showNotesInput)}
-                  className="text-gray-600 hover:text-gray-800"
-                >
-                  {showNotesInput ? 'Hide Notes' : 'Add Notes'}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onClose}
-                  className="text-gray-600 hover:text-gray-800"
-                >
-                  Close
-                </Button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
       {/* Schedule Interview Modal */}
       <ScheduleInterviewModal

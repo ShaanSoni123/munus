@@ -1,0 +1,47 @@
+services:
+  # Backend API Service
+  - type: web
+    name: munus-backend
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: python start_production.py
+    rootDir: backend
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: MONGODB_URI
+        value: mongodb+srv://shaansoni21:L7H0k0nER4DjEM1D@munusdb.f8c3gzf.mongodb.net/?retryWrites=true&w=majority&appName=Munusdb
+      - key: MONGODB_DB_NAME
+        value: jobify
+      - key: SECRET_KEY
+        value: munus-production-secret-key-2024-secure-jwt-token-change-in-production
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 10080
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: BACKEND_CORS_ORIGINS
+        value: '["https://munus-frontend.onrender.com","https://gomunus.com","https://www.gomunus.com","http://localhost:3000"]'
+      - key: API_V1_STR
+        value: /api/v1
+      - key: PROJECT_NAME
+        value: Munus API
+      - key: VERSION
+        value: 1.0.0
+
+  # Frontend Static Site  
+  - type: web
+    name: munus-frontend
+    env: static
+    plan: free
+    region: oregon
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://munus-backend.onrender.com

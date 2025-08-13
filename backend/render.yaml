@@ -22,6 +22,8 @@ services:
         value: 7
       - key: BACKEND_CORS_ORIGINS
         value: '["https://www.gomunus.com","https://gomunus.com","https://munus-nu.vercel.app"]'
+      - key: OPENAI_API_KEY
+        value: your-openai-api-key-here
       - key: ENVIRONMENT
         value: production
       - key: DEBUG

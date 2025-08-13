@@ -66,10 +66,11 @@ interface DeleteJobDialog {
 }
 
 interface EmployerDashboardProps {
-  onNavigate?: (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings') => void;
+  onNavigate?: (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'application-detail') => void;
+  onApplicationSelect?: (application: Application) => void;
 }
 
-export const EmployerDashboard: React.FC<EmployerDashboardProps> = ({ onNavigate }) => {
+export const EmployerDashboard: React.FC<EmployerDashboardProps> = ({ onNavigate, onApplicationSelect }) => {
   const [jobs, setJobs] = useState<JobResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -92,6 +93,9 @@ export const EmployerDashboard: React.FC<EmployerDashboardProps> = ({ onNavigate
   // New state for tracking statistics
   const [acceptedApplications, setAcceptedApplications] = useState<Application[]>([]);
   const [allApplications, setAllApplications] = useState<Application[]>([]);
+  
+  // State for application detail page navigation
+  const [selectedApplicationForPage, setSelectedApplicationForPage] = useState<Application | null>(null);
   
   const { user } = useAuth();
   const { theme } = useTheme();
@@ -162,6 +166,15 @@ export const EmployerDashboard: React.FC<EmployerDashboardProps> = ({ onNavigate
       jobTitle: '',
       applicationsCount: 0
     });
+  };
+
+  const handleViewApplicationPage = (application: Application) => {
+    if (onApplicationSelect) {
+      onApplicationSelect(application);
+    }
+    if (onNavigate) {
+      onNavigate('application-detail');
+    }
   };
 
   const handleApplicationStatusUpdate = async (applicationId: string, status: string, notes?: string) => {
@@ -950,6 +963,7 @@ export const EmployerDashboard: React.FC<EmployerDashboardProps> = ({ onNavigate
           application={selectedApplication}
           onStatusUpdate={handleApplicationStatusUpdate}
           isUpdating={updatingApplicationId === selectedApplication?._id}
+          onViewFullPage={handleViewApplicationPage}
         />
 
         {/* Analytics Modal */}

@@ -3,18 +3,13 @@
 
 ## ⚠️ CRITICAL: Complete These Steps Before Deployment
 
-### 1. **Supabase Database Setup** (REQUIRED)
+### 1. **MongoDB Database Setup** (REQUIRED)
 ```bash
-# Go to https://supabase.com
-# Create new project: "munus-production"
-# Get these credentials and update .env.production:
+# MongoDB is already configured with:
+MONGODB_URI=mongodb+srv://shaansoni21:L7H0k0nER4DjEM1D@munusdb.f8c3gzf.mongodb.net/?retryWrites=true&w=majority&appName=Munusdb
+MONGODB_DB_NAME=jobify
 
-VITE_SUPABASE_URL=https://your-project-id.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key-here
-
-# Database URLs (from Supabase dashboard)
-DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-ID].supabase.co:5432/postgres
-ASYNC_DATABASE_URL=postgresql+asyncpg://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-ID].supabase.co:5432/postgres
+# No additional database setup required - MongoDB is production-ready!
 ```
 
 ### 2. **Generate Secure Secret Keys** (REQUIRED)
@@ -45,7 +40,7 @@ MAIL_FROM=noreply@gomunuc.com
 
 ### 5. **File Storage Setup** (RECOMMENDED)
 ```bash
-# AWS S3 or Supabase Storage
+# AWS S3 for file uploads
 AWS_ACCESS_KEY_ID=your-aws-key
 AWS_SECRET_ACCESS_KEY=your-aws-secret
 AWS_BUCKET_NAME=munus-uploads
@@ -74,10 +69,10 @@ vercel --prod
 
 ## ✅ Pre-Deployment Checklist
 
-- [ ] Supabase project created and configured
-- [ ] Database URLs updated in .env.production
-- [ ] Secret keys generated and updated
+- [x] MongoDB database configured and working
+- [ ] Secret keys generated and updated  
 - [ ] CORS origins configured for gomunuc.com
+- [x] Authentication system working with MongoDB
 - [ ] API base URL set to production domain
 - [ ] Email service configured
 - [ ] File storage configured

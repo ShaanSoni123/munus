@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// API Configuration - Updated for production
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://gomunus-backend.onrender.com';
+// API Configuration - Updated for production with fallback
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 const API_VERSION = '/api/v1';
 
 // Create axios instance with better error handling
@@ -122,14 +122,14 @@ apiClient.interceptors.response.use(
 
 // Generic API methods with better error handling
 export const api = {
-  get: <T = any>(url: string, params?: any): Promise<any> => {
+  get: (url: string, params?: any): Promise<any> => {
     return apiClient.get(url, { params }).catch((error) => {
       console.error(`GET ${url} failed:`, error);
       throw error;
     });
   },
   
-  post: <T = any>(url: string, data?: any): Promise<any> => {
+  post: (url: string, data?: any): Promise<any> => {
     console.log(`API: Making POST request to ${url}`);
     console.log('API: Request data:', data);
     return apiClient.post(url, data).catch((error) => {
@@ -139,7 +139,7 @@ export const api = {
     });
   },
   
-  put: <T = any>(url: string, data?: any): Promise<any> => {
+  put: (url: string, data?: any): Promise<any> => {
     console.log(`API: Making PUT request to ${url}`);
     console.log('API: Request data:', data);
     return apiClient.put(url, data).catch((error) => {
@@ -149,21 +149,21 @@ export const api = {
     });
   },
   
-  patch: <T = any>(url: string, data?: any): Promise<any> => {
+  patch: (url: string, data?: any): Promise<any> => {
     return apiClient.patch(url, data).catch((error) => {
       console.error(`PATCH ${url} failed:`, error);
       throw error;
     });
   },
   
-  delete: <T = any>(url: string): Promise<any> => {
+  delete: (url: string): Promise<any> => {
     return apiClient.delete(url).catch((error) => {
       console.error(`DELETE ${url} failed:`, error);
       throw error;
     });
   },
   
-  upload: <T = any>(url: string, formData: FormData): Promise<any> => {
+  upload: (url: string, formData: FormData): Promise<any> => {
     console.log(`API: Making UPLOAD request to ${url}`);
     console.log('API: FormData contents:');
     for (let [key, value] of formData.entries()) {
