@@ -27,6 +27,7 @@ import { ContactPage } from './components/contact/ContactPage';
 import { SettingsPage } from './components/profile/SettingsPage';
 import { NotificationsPage } from './components/notifications/NotificationsPage';
 import { AIChatbot } from './components/common/AIChatbot';
+import { Analytics } from '@vercel/analytics/react';
 
 const AppContent: React.FC = () => {
   console.log('🚀 AppContent component rendering...'); // DEBUG LINE - ADDED
@@ -298,6 +299,7 @@ const AppContent: React.FC = () => {
       
       {/* AI Chatbot - Only show on dashboard and related pages */}
       {(currentView === 'dashboard' || currentView === 'post-job') && <AIChatbot />}
+      <Analytics />
     </div>
   );
 };

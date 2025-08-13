@@ -12,6 +12,7 @@ import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
 import { Country, State, City } from 'country-state-city';
 import { api } from '../../services/api';
+import { track } from '@vercel/analytics';
 
 interface ProfileCreationProps {
   onComplete: () => void;
@@ -114,6 +115,12 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
 
   // Initialize component state when mounted (but don't reset if already has data)
   useEffect(() => {
+    // Track profile creation page visit
+    track('profile_creation_page_visit', {
+      user_type: profileData.userType || 'not_selected',
+      step: currentStep + 1
+    });
+
     // Only reset if we don't have any data yet
     if (!profileData.firstName && !profileData.email) {
       setCurrentStep(0);
@@ -141,6 +148,15 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
 
   const updateProfileData = (field: keyof ProfileData, value: any) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
+    
+    // Track role selection
+    if (field === 'userType' && value) {
+      track('profile_creation_role_selected', {
+        role: value,
+        step: currentStep + 1
+      });
+    }
+    
     // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -256,6 +272,14 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
   const nextStep = () => {
     const valid = validateStep(currentStep);
     if (valid) {
+      // Track step progression
+      track('profile_creation_step_completed', {
+        from_step: currentStep + 1,
+        to_step: currentStep + 2,
+        step_name: steps[currentStep].name,
+        user_type: profileData.userType
+      });
+      
       setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
     }
   };
@@ -349,6 +373,13 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
 
       const result = await register(payload);
       console.log('✅ Registration successful:', result);
+      
+      // Track successful profile creation
+      track('profile_creation_completed', {
+        user_type: profileData.userType,
+        has_photo: !!selectedPhoto,
+        total_steps: steps.length
+      });
       
       // Wait a moment to ensure AuthContext state is updated
       await new Promise(resolve => setTimeout(resolve, 300));

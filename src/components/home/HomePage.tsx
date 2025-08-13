@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight, CheckCircle, Sparkles, Linkedin, Instagram, Users, Shield, Globe, TrendingUp, Clock, Award, Star, Building, Briefcase, Heart, Target, ChevronRight, ExternalLink, Rocket, Play } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { useTheme } from '../../contexts/ThemeContext';
+import { track } from '@vercel/analytics';
 
 interface HomePageProps {
   onGetStarted: () => void;
@@ -15,6 +16,14 @@ interface HomePageProps {
 export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFindJobs, onResumeBuilder }) => {
   const { theme } = useTheme();
   const [showVideoModal, setShowVideoModal] = useState(false);
+
+  // Track homepage visit
+  useEffect(() => {
+    track('homepage_visited', {
+      user_type: 'visitor',
+      theme: theme
+    });
+  }, [theme]);
 
   
   console.log('🏠 HomePage: Rendered with props', { onGetStarted, onSignIn, onFindJobs, onResumeBuilder });
@@ -117,6 +126,54 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
     }
   ];
 
+  const handleGetStarted = () => {
+    track('homepage_get_started_clicked', {
+      section: 'hero',
+      user_type: 'visitor'
+    });
+    onGetStarted();
+  };
+
+  const handleFindJobs = () => {
+    track('homepage_find_jobs_clicked', {
+      section: 'hero',
+      user_type: 'visitor'
+    });
+    onFindJobs();
+  };
+
+  const handleResumeBuilder = () => {
+    track('homepage_resume_builder_clicked', {
+      section: 'hero',
+      user_type: 'visitor'
+    });
+    onResumeBuilder();
+  };
+
+  const handleSignIn = () => {
+    track('homepage_sign_in_clicked', {
+      section: 'header',
+      user_type: 'visitor'
+    });
+    onSignIn();
+  };
+
+  const openVideoModal = () => {
+    track('homepage_video_modal_opened', {
+      section: 'hero',
+      user_type: 'visitor'
+    });
+    setShowVideoModal(true);
+  };
+
+  const closeVideoModal = () => {
+    track('homepage_video_modal_closed', {
+      section: 'hero',
+      user_type: 'visitor'
+    });
+    setShowVideoModal(false);
+  };
+
   return (
     <div className="min-h-screen">
       {/* Enhanced Hero Section */}
@@ -170,7 +227,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                 <Button 
                   variant="primary" 
                   size="xl" 
-                  onClick={onGetStarted}
+                  onClick={handleGetStarted}
                   icon={<ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />}
                   iconPosition="right"
                   className={`shadow-2xl hover-lift text-base sm:text-lg md:text-xl font-bold px-6 sm:px-8 py-3 sm:py-4 w-full sm:w-auto ${
@@ -184,7 +241,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                   size="xl" 
                   icon={<Play className="w-4 h-4 sm:w-5 sm:h-5" />}
                   className="group hover-lift text-base sm:text-lg px-4 sm:px-6 py-3 sm:py-4 w-full sm:w-auto"
-                  onClick={() => setShowVideoModal(true)}
+                  onClick={openVideoModal}
                 >
                   <span className="group-hover:mr-1 transition-all">Watch Demo</span>
                 </Button>
@@ -393,9 +450,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                       size="lg"
                       className={`w-full group-hover:scale-105 transition-all duration-300 text-lg font-semibold bg-gradient-to-r ${feature.color} hover:shadow-xl`}
                       onClick={() => {
-                        if (feature.cta === 'Build Resume') onResumeBuilder();
-                        else if (feature.cta === 'Explore Jobs') onFindJobs();
-                        else onGetStarted();
+                        if (feature.cta === 'Build Resume') handleResumeBuilder();
+                        else if (feature.cta === 'Explore Jobs') handleFindJobs();
+                        else handleGetStarted();
                       }}
                     >
                       {feature.cta}
@@ -428,7 +485,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                   <Button 
                     variant="primary" 
                     size="xl"
-                    onClick={onGetStarted}
+                    onClick={handleGetStarted}
                     icon={<Rocket className="w-6 h-6" />}
                     iconPosition="right"
                     className="shadow-2xl hover-lift text-xl font-bold px-12 py-6"
@@ -438,7 +495,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                   <Button 
                     variant="outline" 
                     size="xl"
-                    onClick={() => setShowVideoModal(true)}
+                    onClick={openVideoModal}
                     icon={<Play className="w-5 h-5" />}
                     iconPosition="right"
                     className="text-lg px-8 py-6"
@@ -526,7 +583,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                   <Button 
                     variant="outline" 
                     size="md"
-                    onClick={onGetStarted}
+                    onClick={handleGetStarted}
                     className="group-hover:bg-blue-600 group-hover:text-white transition-colors"
                   >
                     Learn More
@@ -572,7 +629,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                 <Button 
                   variant="primary" 
                   size="xl"
-                  onClick={onGetStarted}
+                  onClick={handleGetStarted}
                   icon={<Rocket className="w-6 h-6" />}
                   iconPosition="right"
                   className="shadow-2xl hover-lift text-xl font-bold px-12 py-6"
@@ -728,7 +785,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                 Munus Platform Demo
               </h3>
               <button
-                onClick={() => setShowVideoModal(false)}
+                onClick={closeVideoModal}
                 className={`p-1.5 sm:p-2 rounded-full transition-colors ${
                   theme === 'light' 
                     ? 'text-gray-500 hover:text-gray-700 hover:bg-gray-100' 
@@ -768,8 +825,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                   variant="primary"
                   size="sm"
                   onClick={() => {
-                    setShowVideoModal(false);
-                    onGetStarted();
+                    closeVideoModal();
+                    handleGetStarted();
                   }}
                   className="mt-2 sm:mt-3 text-xs sm:text-sm"
                 >
