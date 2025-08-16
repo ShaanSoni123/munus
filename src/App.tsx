@@ -139,7 +139,7 @@ const AppContent: React.FC = () => {
       <div className={`min-h-screen theme-transition ${
         theme === 'light' 
           ? 'bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 light bg-light-pattern' 
-          : 'bg-gradient-to-br from-gray-900 via-gray-900 to-blue-900 dark-neon bg-dark-pattern'
+          : 'bg-gradient-to-br from-gray-900 via-gray-900 to-blue-900 dark bg-dark-pattern'
       }`}>
         <div className="flex items-center justify-center min-h-screen">
           <LoadingSpinner size="lg" text="Loading Munus..." />
@@ -286,7 +286,7 @@ const AppContent: React.FC = () => {
     <div className={`min-h-screen theme-transition ${
       theme === 'light' 
         ? 'bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 light bg-light-pattern' 
-        : 'bg-gradient-to-br from-gray-900 via-gray-900 to-blue-900 dark-neon bg-dark-pattern'
+        : 'bg-gradient-to-br from-gray-900 via-gray-900 to-blue-900 dark bg-dark-pattern'
     }`}>
       <Header 
         onNavigate={handleNavigate}

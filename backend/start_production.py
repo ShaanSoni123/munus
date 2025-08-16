@@ -1,24 +1,26 @@
-import os
+#!/usr/bin/env python3
+"""
+Production startup script for Munus backend
+Optimized for Render deployment
+"""
+
 import uvicorn
-import logging
+import os
 from app.main import app
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 if __name__ == "__main__":
-    try:
-        port = int(os.environ.get("PORT", 8000))
-        logger.info(f"Starting Munus API on port {port}")
-        
-        uvicorn.run(
-            "app.main:app",
-            host="0.0.0.0",
-            port=port,
-            reload=False,
-            log_level="info"
-        )
-    except Exception as e:
-        logger.error(f"Failed to start server: {e}")
-        raise 
+    # Get port from environment variable (Render sets this)
+    port = int(os.environ.get("PORT", 8000))
+    
+    # Get host from environment variable
+    host = os.environ.get("HOST", "0.0.0.0")
+    
+    # Production settings
+    uvicorn.run(
+        "app.main:app",
+        host=host,
+        port=port,
+        reload=False,  # Disable reload in production
+        workers=1,     # Single worker for free tier
+        log_level="info"
+    ) 

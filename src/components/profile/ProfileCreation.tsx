@@ -539,7 +539,7 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
           }`}
         >
           <div className={`w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 ${
-            theme === 'dark-neon' ? 'shadow-lg shadow-blue-500/25' : 'shadow-lg'
+            'shadow-lg'
           }`}>
             <User className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           </div>
@@ -575,7 +575,7 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
           }`}
         >
           <div className={`w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4 ${
-            theme === 'dark-neon' ? 'shadow-lg shadow-purple-500/25' : 'shadow-lg'
+            'shadow-lg'
           }`}>
             <Building className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
           </div>
@@ -1377,7 +1377,7 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
   const renderComplete = () => (
     <div className="text-center space-y-6">
       <div className={`w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto ${
-        theme === 'dark-neon' ? 'shadow-lg shadow-green-500/25' : 'shadow-lg'
+        'shadow-lg'
       }`}>
         <CheckCircle className="w-10 h-10 text-white" />
       </div>
@@ -1573,7 +1573,7 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
                   <div key={step.id} className="flex items-center flex-shrink-0">
                     <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all ${
                       isActive
-                        ? `bg-blue-600 text-white ${theme === 'dark-neon' ? 'shadow-lg shadow-blue-500/25' : 'shadow-lg'}`
+                        ? `bg-blue-600 text-white ${'shadow-lg'}`
                         : isComplete
                         ? 'bg-green-500 text-white'
                         : `${theme === 'light' ? 'bg-gray-200 text-gray-500' : 'bg-gray-700 text-gray-500'}`

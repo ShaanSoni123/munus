@@ -33,15 +33,11 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     return 'light';
   });
 
-  const isDark = theme === 'dark-neon' || theme === 'dark'; // FIXED: Added 'dark' theme support
+  const isDark = theme === 'dark';
 
   const toggleTheme = () => {
-    // FIXED: Cycle through all themes properly
-    const themes: Theme[] = ['light', 'dark', 'dark-neon'];
-    const currentIndex = themes.indexOf(theme);
-    const nextIndex = (currentIndex + 1) % themes.length;
-    const newTheme = themes[nextIndex];
-    setTheme(newTheme);
+    // Simple toggle between light and dark
+    setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
   useEffect(() => {
@@ -49,7 +45,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     document.documentElement.className = theme;
     
     // Apply theme-specific body classes
-    if (theme === 'dark-neon' || theme === 'dark') {
+    if (theme === 'dark') {
       document.body.classList.add('dark');
     } else {
       document.body.classList.remove('dark');
