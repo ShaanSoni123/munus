@@ -33,9 +33,14 @@ export const Card: React.FC<CardProps> = ({
       ${hover ? 'hover:shadow-xl hover:border-gray-300 soft-shadow' : ''}
       ${gradient ? 'from-white to-gray-50' : ''}
     `,
+    dark: `
+      bg-gray-800/50 border-gray-700/50 shadow-lg shadow-emerald-500/5 backdrop-blur-sm
+      ${hover ? 'hover:shadow-2xl hover:shadow-emerald-500/20 hover:border-emerald-500/30' : ''}
+      ${gradient ? 'from-gray-800/50 to-gray-700/50 border-gray-600/50' : ''}
+    `,
     'dark-neon': `
-      bg-gray-900 border-gray-700 shadow-lg shadow-cyan-500/5
-      ${hover ? 'hover:shadow-2xl hover:shadow-cyan-500/20 hover:border-cyan-500/30 neon-glow' : ''}
+      bg-gray-900 border-gray-700 shadow-lg shadow-emerald-500/5
+      ${hover ? 'hover:shadow-2xl hover:shadow-emerald-500/20 hover:border-emerald-500/30 neon-glow' : ''}
       ${gradient ? 'from-gray-900 to-gray-800 border-gray-600' : ''}
     `,
   };

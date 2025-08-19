@@ -25,19 +25,24 @@ interface ThemeProviderProps {
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem('munus-theme');
-    // Only use saved theme if user has explicitly set it (not on first visit)
+    // Default to dark theme for new users (AI Fiesta style)
     if (saved && saved !== 'light') {
       return saved as Theme;
     }
-    // Default to light theme for new users
-    return 'light';
+    return 'dark';
   });
 
-  const isDark = theme === 'dark';
+  const isDark = theme === 'dark' || theme === 'dark-neon';
 
   const toggleTheme = () => {
-    // Simple toggle between light and dark
-    setTheme(theme === 'light' ? 'dark' : 'light');
+    // Cycle through themes: dark -> light -> dark-neon -> dark
+    if (theme === 'dark') {
+      setTheme('light');
+    } else if (theme === 'light') {
+      setTheme('dark-neon');
+    } else {
+      setTheme('dark');
+    }
   };
 
   useEffect(() => {
@@ -45,7 +50,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     document.documentElement.className = theme;
     
     // Apply theme-specific body classes
-    if (theme === 'dark') {
+    if (theme === 'dark' || theme === 'dark-neon') {
       document.body.classList.add('dark');
     } else {
       document.body.classList.remove('dark');

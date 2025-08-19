@@ -41,33 +41,34 @@ export const Button: React.FC<ButtonProps> = ({
 
   const variantStyles = {
     primary: `
-      bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
-      text-white shadow-lg hover:shadow-xl focus:ring-blue-500
-      ${theme === 'dark-neon' ? 'from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 shadow-cyan-500/25 hover:shadow-cyan-500/40' : ''}
+      bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600
+      text-white shadow-lg hover:shadow-xl focus:ring-emerald-500
+      ${theme === 'dark-neon' ? 'shadow-emerald-500/25 hover:shadow-emerald-500/40' : ''}
       ${theme === 'light' ? 'text-white' : ''}
     `,
     secondary: `
-      bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700
-      text-white shadow-lg hover:shadow-xl focus:ring-purple-500
-      ${theme === 'dark-neon' ? 'from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-purple-500/25' : ''}
+      bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600
+      text-white shadow-lg hover:shadow-xl focus:ring-emerald-500
+      ${theme === 'dark-neon' ? 'shadow-emerald-500/25 hover:shadow-emerald-500/40' : ''}
     `,
     outline: `
-      border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white
-      focus:ring-blue-500 shadow-sm hover:shadow-md
-      ${theme === 'dark-neon' ? 'border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black shadow-cyan-400/20' : ''}
-      ${theme === 'light' ? 'text-white' : ''}
+      border-2 border-emerald-500 text-emerald-400 hover:bg-emerald-500/10 hover:text-emerald-300
+      focus:ring-emerald-500 shadow-sm hover:shadow-md
+      ${theme === 'dark-neon' ? 'border-emerald-400 text-emerald-400 hover:bg-emerald-500/10 shadow-emerald-400/20' : ''}
+      ${theme === 'light' ? 'text-emerald-600 border-emerald-600 hover:bg-emerald-50' : ''}
     `,
     ghost: `
-      text-gray-700 hover:bg-gray-100 focus:ring-gray-500
-      ${theme === 'dark-neon' ? 'text-gray-300 hover:bg-gray-800 focus:ring-cyan-500' : ''}
+      text-gray-300 hover:bg-gray-800/50 focus:ring-emerald-500
+      ${theme === 'dark-neon' ? 'text-gray-300 hover:bg-gray-800/50 focus:ring-emerald-500' : ''}
+      ${theme === 'light' ? 'text-gray-700 hover:bg-gray-100 focus:ring-emerald-500' : ''}
     `,
     danger: `
       bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700
       text-white shadow-lg hover:shadow-xl focus:ring-red-500
     `,
     success: `
-      bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700
-      text-white shadow-lg hover:shadow-xl focus:ring-green-500
+      bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700
+      text-white shadow-lg hover:shadow-xl focus:ring-emerald-500
     `,
   };
 

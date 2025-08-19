@@ -21,6 +21,10 @@ const loadGoogleAPIs = () => {
   document.head.appendChild(oauthScript);
 };
 
+// Apply dark theme by default
+document.documentElement.classList.add('dark');
+document.body.classList.add('dark');
+
 // Load Google APIs when the app starts
 loadGoogleAPIs();
 

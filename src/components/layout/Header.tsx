@@ -109,11 +109,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className={`sticky top-0 z-50 transition-all duration-300 border-b backdrop-blur-lg ${
-        theme === 'light'
-          ? 'bg-white/95 border-gray-200/50 shadow-sm'
-          : 'bg-gray-900/95 border-gray-700/50 shadow-lg'
-      }`}>
+      <header className="sticky top-0 z-50 transition-all duration-300 border-b border-gray-700/50 backdrop-blur-lg bg-gray-900/95 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
@@ -122,12 +118,10 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => handleNavigation('home')}
                 className="flex-shrink-0 flex items-center space-x-2 hover:opacity-80 transition-all duration-200 hover:scale-105"
               >
-                <div className={`w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                  theme === 'dark-neon' ? 'shadow-lg shadow-blue-500/25' : 'shadow-md'
-                }`}>
+                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center transition-all duration-300 shadow-lg shadow-emerald-500/25">
                   <Zap className="w-5 h-5 text-white" />
                 </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
                   Munus
                 </h1>
               </button>
@@ -141,11 +135,9 @@ export const Header: React.FC<HeaderProps> = ({
                 <button
                   key={item.name}
                   onClick={() => handleNavigation(item.view)}
-                  className={`text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-cyan-400 px-4 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center space-x-2 ${
+                  className={`text-gray-300 hover:text-emerald-400 px-4 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-gray-800/50 flex items-center space-x-2 ${
                     currentView === item.view 
-                      ? `text-blue-600 dark:text-cyan-400 ${
-                          theme === 'light' ? 'bg-blue-50' : 'bg-cyan-900/20'
-                        }` 
+                      ? 'text-emerald-400 bg-emerald-900/20' 
                       : ''
                   }`}
                 >
@@ -164,7 +156,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="relative hover-lift"
+                    className="relative hover-lift text-gray-300 hover:text-emerald-400 hover:bg-gray-800/50"
                     onClick={() => setIsNotificationsOpen(true)}
                     icon={<Bell className="w-4 h-4" />}
                   >
@@ -172,9 +164,7 @@ export const Header: React.FC<HeaderProps> = ({
                       <Badge 
                         variant="error" 
                         size="sm" 
-                        className={`absolute -top-1 -right-1 min-w-[20px] h-5 flex items-center justify-center text-xs font-bold animate-pulse ${
-                          theme === 'dark-neon' ? 'shadow-lg shadow-red-500/25' : ''
-                        }`}
+                        className="absolute -top-1 -right-1 min-w-[20px] h-5 flex items-center justify-center text-xs font-bold animate-pulse shadow-lg shadow-red-500/25"
                       >
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </Badge>
@@ -188,252 +178,144 @@ export const Header: React.FC<HeaderProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={toggleTheme}
-                className={`theme-toggle relative overflow-hidden transition-all duration-300 ${
-                  isDark 
-                    ? 'text-cyan-400 hover:bg-cyan-900/20 hover:text-cyan-300' 
-                    : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'
-                }`}
+                className="theme-toggle relative overflow-hidden transition-all duration-300 text-gray-300 hover:bg-gray-800/50 hover:text-emerald-400"
                 icon={
                   <div className="relative">
                     {isDark ? (
-                      <Moon className={`w-4 h-4 transition-all duration-300 ${
-                        theme === 'dark-neon' ? 'animate-pulse' : ''
-                      }`} />
+                      <Sun className="w-4 h-4 transition-all duration-300" />
                     ) : (
-                      <Sun className={`w-4 h-4 transition-all duration-300`} />
+                      <Moon className="w-4 h-4 transition-all duration-300" />
                     )}
                   </div>
                 }
-                title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Neon Theme'}
               />
 
-              {isAuthenticated ? (
-                /* User Profile Dropdown */
+              {/* Auth Buttons */}
+              {!isAuthenticated ? (
+                <div className="flex items-center space-x-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onSignIn}
+                    className="btn-login border-0 text-white font-semibold shadow-lg"
+                  >
+                    Log In
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={onGetStarted}
+                    className="btn-get-started border-0 text-white font-semibold shadow-lg"
+                  >
+                    Get Started
+                  </Button>
+                </div>
+              ) : (
+                /* User Profile Menu */
                 <div className="relative" ref={profileRef}>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className={`flex items-center space-x-2 transition-all duration-200 ${
-                      theme === 'light' 
-                        ? 'hover:bg-gray-100' 
-                        : 'hover:bg-gray-800'
-                    }`}
+                    className="flex items-center space-x-2 text-gray-300 hover:text-emerald-400 hover:bg-gray-800/50"
+                    icon={<User className="w-4 h-4" />}
                   >
-                    <div className={`w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      theme === 'dark-neon' ? 'shadow-lg shadow-blue-500/25' : 'shadow-md'
-                    }`}>
-                      <span className="text-white text-sm font-medium">
-                        {user?.name?.charAt(0).toUpperCase() || 'U'}
-                      </span>
-                    </div>
-                    <div className="hidden sm:block text-left">
-                      <div className="text-sm font-medium">{user?.name || 'User'}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        {user?.role === 'employer' ? 'Employer' : 'Job Seeker'}
-                      </div>
-                    </div>
-                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
-                      isProfileOpen ? 'rotate-180' : ''
-                    }`} />
+                    <span className="hidden sm:block">{user?.name || 'User'}</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
                   </Button>
-                  
+
+                  {/* Profile Dropdown */}
                   {isProfileOpen && (
-                    <div className={`absolute right-0 mt-2 w-64 rounded-xl shadow-xl border py-2 z-50 animate-scale-in backdrop-blur-lg ${
-                      theme === 'light'
-                        ? 'bg-white/95 border-gray-200'
-                        : 'bg-gray-800/95 border-gray-700'
-                    }`}>
-                      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                        <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.name || 'User'}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email || 'user@example.com'}</p>
-                        <div className="mt-2">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                            user?.role === 'employer' 
-                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
-                              : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                          }`}>
-                            {user?.role === 'employer' ? 'Employer' : 'Job Seeker'}
-                          </span>
+                    <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700/50 rounded-xl shadow-xl backdrop-blur-sm z-50">
+                      <div className="py-2">
+                        <div className="px-4 py-3 border-b border-gray-700/50">
+                          <p className="text-sm font-medium text-white">{user?.name || 'User'}</p>
+                          <p className="text-sm text-gray-400">{user?.email}</p>
                         </div>
-                      </div>
-                      
-                      <button 
-                        onClick={() => handleNavigation('profile')}
-                        className={`w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 flex items-center space-x-3 transition-colors ${
-                          theme === 'light' 
-                            ? 'hover:bg-gray-50' 
-                            : 'hover:bg-gray-700'
-                        }`}
-                      >
-                        <User className="w-4 h-4" />
-                        <span>My Profile</span>
-                      </button>
-                      
-                      <button 
-                        onClick={() => handleNavigation('settings')}
-                        className={`w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 flex items-center space-x-3 transition-colors ${
-                          theme === 'light' 
-                            ? 'hover:bg-gray-50' 
-                            : 'hover:bg-gray-700'
-                        }`}
-                      >
-                        <Settings className="w-4 h-4" />
-                        <span>Settings</span>
-                      </button>
-                      
-                      <button 
-                        onClick={() => handleNavigation('faqs')}
-                        className={`w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 flex items-center space-x-3 transition-colors ${
-                          theme === 'light' 
-                            ? 'hover:bg-gray-50' 
-                            : 'hover:bg-gray-700'
-                        }`}
-                      >
-                        <HelpCircle className="w-4 h-4" />
-                        <span>FAQs</span>
-                      </button>
-                      
-                      <button 
-                        onClick={() => handleNavigation('contact')}
-                        className={`w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 flex items-center space-x-3 transition-colors ${
-                          theme === 'light' 
-                            ? 'hover:bg-gray-50' 
-                            : 'hover:bg-gray-700'
-                        }`}
-                      >
-                        <Mail className="w-4 h-4" />
-                        <span>Contact Us</span>
-                      </button>
-                      
-                      <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2">
-                        <button
-                          onClick={handleLogout}
-                          className={`w-full px-4 py-3 text-left text-sm text-red-600 dark:text-red-400 flex items-center space-x-3 transition-colors ${
-                            theme === 'light' 
-                              ? 'hover:bg-red-50' 
-                              : 'hover:bg-red-900/20'
-                          }`}
-                        >
-                          <LogOut className="w-4 h-4" />
-                          <span>Sign out</span>
-                        </button>
+                        
+                        <div className="py-2">
+                          <button
+                            onClick={() => handleNavigation('profile')}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50 transition-colors flex items-center space-x-2"
+                          >
+                            <User className="w-4 h-4" />
+                            <span>Profile</span>
+                          </button>
+                          
+                          <button
+                            onClick={() => handleNavigation('settings')}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50 transition-colors flex items-center space-x-2"
+                          >
+                            <Settings className="w-4 h-4" />
+                            <span>Settings</span>
+                          </button>
+                          
+                          <button
+                            onClick={() => handleNavigation('help')}
+                            className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50 transition-colors flex items-center space-x-2"
+                          >
+                            <HelpCircle className="w-4 h-4" />
+                            <span>Help</span>
+                          </button>
+                        </div>
+                        
+                        <div className="border-t border-gray-700/50 py-2">
+                          <button
+                            onClick={handleLogout}
+                            className="w-full text-left px-4 py-2 text-sm text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-colors flex items-center space-x-2"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            <span>Sign Out</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   )}
                 </div>
-              ) : (
-                /* Login/Register Buttons */
-                <div className="flex items-center space-x-2">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="hidden sm:flex hover-lift"
-                    onClick={onSignIn}
-                  >
-                    Log In
-                  </Button>
-                  <Button 
-                    variant="primary" 
-                    size="sm"
-                    onClick={onGetStarted}
-                    className="hover-lift shadow-lg"
-                  >
-                    Get Started
-                  </Button>
-                </div>
               )}
 
-              {/* Mobile menu button */}
-              <div className="md:hidden">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  icon={isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-                  className="hover-lift"
-                />
+              {/* Mobile Menu Button */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="md:hidden text-gray-300 hover:text-emerald-400 hover:bg-gray-800/50"
+                icon={isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              />
+            </div>
+          </div>
+
+          {/* Mobile Navigation Menu */}
+          {isMenuOpen && (
+            <div className="md:hidden border-t border-gray-700/50 bg-gray-800/50 backdrop-blur-sm">
+              <div className="px-2 pt-2 pb-3 space-y-1">
+                {navigation.map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <button
+                      key={item.name}
+                      onClick={() => handleNavigation(item.view)}
+                      className={`w-full text-left px-3 py-2 text-base font-medium rounded-lg transition-colors flex items-center space-x-2 ${
+                        currentView === item.view
+                          ? 'text-emerald-400 bg-emerald-900/20'
+                          : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50'
+                      }`}
+                    >
+                      <IconComponent className="w-5 h-5" />
+                      <span>{item.name}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
-          </div>
+          )}
         </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className={`md:hidden border-t backdrop-blur-lg animate-slide-up ${
-            theme === 'light'
-              ? 'border-gray-200 bg-white/95'
-              : 'border-gray-700 bg-gray-900/95'
-          }`}>
-            <div className="px-4 pt-2 pb-3 space-y-1">
-              {navigation.map((item) => {
-                const IconComponent = item.icon;
-                return (
-                <button
-                  key={item.name}
-                  onClick={() => handleNavigation(item.view)}
-                  className={`block w-full text-left px-3 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-cyan-400 rounded-lg transition-all duration-200 flex items-center space-x-3 ${
-                    currentView === item.view 
-                      ? `text-blue-600 dark:text-cyan-400 ${
-                          theme === 'light' ? 'bg-blue-50' : 'bg-cyan-900/20'
-                        }` 
-                      : `${
-                          theme === 'light' 
-                            ? 'hover:bg-gray-100' 
-                            : 'hover:bg-gray-800'
-                        }`
-                  }`}
-                >
-                    <IconComponent className="w-5 h-5" />
-                  <span>{item.name}</span>
-                </button>
-                );
-              })}
-              
-              {/* Mobile Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className={`block w-full text-left px-3 py-3 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-cyan-400 rounded-lg transition-all duration-200 flex items-center space-x-3 ${
-                  theme === 'light' 
-                    ? 'hover:bg-gray-100' 
-                    : 'hover:bg-gray-800'
-                }`}
-              >
-                {isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                <span>{isDark ? 'Switch to Light Theme' : 'Switch to Dark Neon Theme'}</span>
-              </button>
-              
-              {!isAuthenticated && (
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    fullWidth
-                    onClick={onSignIn}
-                    className="hover-lift justify-start"
-                  >
-                    Log In
-                  </Button>
-                  <Button 
-                    variant="primary" 
-                    size="sm" 
-                    fullWidth
-                    onClick={onGetStarted}
-                    className="hover-lift shadow-lg"
-                  >
-                    Get Started
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </header>
 
       {/* Notifications Panel */}
-      <NotificationsPanel 
-        isOpen={isNotificationsOpen} 
-        onClose={() => setIsNotificationsOpen(false)} 
+      <NotificationsPanel
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
       />
     </>
   );

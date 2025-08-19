@@ -61,6 +61,12 @@ const AppContent: React.FC = () => {
   // Navigation logic is now handled in the useEffect below
 
   // Handle authentication state changes
+  // Apply dark theme by default
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+    document.body.classList.add('dark');
+  }, []);
+
   useEffect(() => {
     if (loading) return;
 
