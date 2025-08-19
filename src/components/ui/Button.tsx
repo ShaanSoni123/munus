@@ -27,9 +27,9 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = `
     inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200
     focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed
-    transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden
+    transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden cursor-pointer
     ${fullWidth ? 'w-full' : ''}
-    ${disabled || loading ? 'pointer-events-none' : ''}
+    ${disabled || loading ? 'pointer-events-none cursor-not-allowed' : ''}
   `;
 
   const sizeStyles = {

@@ -239,6 +239,21 @@
   overflow: hidden;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+  cursor: pointer !important;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+.btn-get-started:hover {
+  animation: rollingGradient 1.2s ease infinite;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(14, 165, 233, 0.6);
+  cursor: pointer !important;
+}
+
+.btn-get-started:active {
+  transform: translateY(-1px);
+  cursor: pointer !important;
 }
 
 .btn-get-started::before {
@@ -261,12 +276,6 @@
   left: 100%;
 }
 
-.btn-get-started:hover {
-  animation: rollingGradient 1.2s ease infinite;
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(14, 165, 233, 0.6);
-}
-
 /* Login Button Rolling Gradient - AI Fiesta Style */
 .btn-login {
   background: linear-gradient(
@@ -283,6 +292,21 @@
   overflow: hidden;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  cursor: pointer !important;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+  animation: rollingGradient 2s ease infinite;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+  cursor: pointer !important;
+}
+
+.btn-login:active {
+  transform: translateY(0);
+  cursor: pointer !important;
 }
 
 .btn-login::before {
@@ -303,12 +327,6 @@
 
 .btn-login:hover::before {
   left: 100%;
-}
-
-.btn-login:hover {
-  animation: rollingGradient 2s ease infinite;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
 }
 
 /* Additional AI Fiesta Button Enhancements */
@@ -2148,4 +2166,69 @@ section[class*="bg-gradient-to-r from-indigo-950"] .text-gray-600,
 section[class*="bg-gradient-to-r from-indigo-950"] .text-gray-500,
 section[class*="bg-gradient-to-r from-indigo-950"] .text-gray-400 {
   color: #ffffff !important;
+}
+
+/* Force cursor pointer on all interactive elements */
+[onClick],
+[onclick],
+.cursor-pointer,
+button,
+a,
+.interactive {
+  cursor: pointer !important;
+}
+
+/* Hover effects for all interactive elements */
+[onClick]:hover,
+[onclick]:hover,
+.cursor-pointer:hover,
+button:hover,
+a:hover,
+.interactive:hover {
+  cursor: pointer !important;
+  transform: translateY(-1px);
+}
+
+/* Debug: Force cursor pointer everywhere */
+* {
+  cursor: inherit;
+}
+
+/* Override any conflicting cursor styles */
+.btn-get-started,
+.btn-login,
+button,
+.interactive-heading,
+h1,
+p {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure buttons are clickable */
+.btn-get-started,
+.btn-login {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/* Force interactive elements to be clickable */
+.interactive-heading,
+.interactive {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  user-select: none !important;
+}
+
+/* Debug: Add visible hover effects */
+.btn-get-started:hover,
+.btn-login:hover,
+.interactive-heading:hover {
+  cursor: pointer !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 30px rgba(14, 165, 233, 0.6) !important;
 }

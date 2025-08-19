@@ -25,7 +25,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
       theme: theme
     });
   }, [theme]);
-
+  
   console.log('🏠 HomePage: Rendered with props', { onGetStarted, onSignIn, onFindJobs, onResumeBuilder });
 
   const features = [
@@ -194,7 +194,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
         <div className="floating-particle"></div>
         <div className="floating-particle"></div>
         <div className="floating-particle"></div>
-
+        
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Curved Border Accent */}
           <div className="curved-border absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-1"></div>
@@ -210,21 +210,21 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
               </div>
 
               {/* Main Headline */}
-              <div className="space-y-6">
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-white">
+              <div className="space-y-6" style={{ cursor: 'pointer', userSelect: 'none' }}>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-white interactive-heading" style={{ cursor: 'pointer', userSelect: 'none' }}>
                   World's Most Powerful
                   <span className="block font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
                     Job Platform
-                  </span>
+                </span>
                   <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl text-gray-300">
                     One Subscription
-                  </span>
-                </h1>
-                
-                <p className="text-lg sm:text-xl md:text-2xl leading-relaxed text-gray-300 max-w-2xl">
+                </span>
+              </h1>
+              
+                <p className="text-lg sm:text-xl md:text-2xl leading-relaxed text-gray-300 max-w-2xl" style={{ cursor: 'pointer', userSelect: 'none' }}>
                   Stop juggling multiple job sites and subscriptions - Munus gives you access to all best-in-class AI-powered job matching, resume building, and career development tools for just $12/month.
-                </p>
-              </div>
+              </p>
+            </div>
               
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
@@ -235,6 +235,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                   icon={<ArrowRight className="w-5 h-5" />}
                   iconPosition="right"
                   className="btn-get-started border-0 text-white font-bold px-8 py-4 text-lg shadow-2xl transition-all duration-300 hover:scale-105"
+                  style={{ cursor: 'pointer', userSelect: 'none', zIndex: 10, position: 'relative' }}
                 >
                   Get Started Now
                 </Button>
@@ -244,6 +245,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                   icon={<Play className="w-5 h-5" />}
                   className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-400 px-8 py-4 text-lg font-semibold transition-all duration-300"
                   onClick={openVideoModal}
+                  style={{ cursor: 'pointer', userSelect: 'none', zIndex: 10, position: 'relative' }}
                 >
                   Watch Demo
                 </Button>
@@ -254,7 +256,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                 Experience smarter & more accurate job matching
               </p>
             </div>
-
+            
                         {/* Right Content - Video Demo */}
             <div className="relative">
               <VideoDemo />
@@ -305,10 +307,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                   {/* Header */}
                   <div className="space-y-4">
                     <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl group-hover:scale-110 transition-all duration-500 shadow-xl shadow-emerald-500/25`}>
-                      <div className="text-white">
-                        {feature.icon}
-                      </div>
-                    </div>
+                  <div className="text-white">
+                    {feature.icon}
+                  </div>
+                </div>
                     
                     <div>
                       <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-emerald-400 transition-colors">
@@ -426,13 +428,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
           <Card className="p-12 bg-gray-800/50 border border-gray-700/50 backdrop-blur-sm">
             <div className="space-y-8">
               <h3 className="text-4xl font-bold text-white">
-                Ready to Experience the Difference?
-              </h3>
+                  Ready to Experience the Difference?
+                </h3>
               <p className="text-xl text-gray-300">
-                Join ambitious professionals who are building successful careers with Munus
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                                  <Button 
+                  Join ambitious professionals who are building successful careers with Munus
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <Button 
                     variant="primary" 
                     size="xl"
                     onClick={handleGetStarted}
@@ -442,12 +444,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                   >
                     Start Free Today
                   </Button>
-                <Button 
-                  variant="outline" 
-                  size="xl"
-                  onClick={openVideoModal}
-                  icon={<Play className="w-5 h-5" />}
-                  iconPosition="right"
+                  <Button 
+                    variant="outline" 
+                    size="xl"
+                    onClick={openVideoModal}
+                    icon={<Play className="w-5 h-5" />}
+                    iconPosition="right"
                   className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-400 px-12 py-6 text-xl font-semibold transition-all duration-300"
                 >
                   Watch Demo
@@ -462,12 +464,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
       {showVideoModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="relative bg-gray-900 rounded-2xl p-6 max-w-4xl w-full">
-            <button
-              onClick={closeVideoModal}
+              <button
+                onClick={closeVideoModal}
               className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
             >
               <X className="w-6 h-6" />
-            </button>
+              </button>
             <div className="aspect-video bg-gray-800 rounded-xl flex items-center justify-center">
               <div className="text-center">
                 <Play className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
