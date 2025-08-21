@@ -9,7 +9,7 @@ import { notificationService } from '../../services/notificationService';
 import { useApi } from '../../hooks/useApi';
 
 interface HeaderProps {
-  onNavigate?: (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings') => void;
+  onNavigate?: (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'privacy' | 'terms') => void;
   currentView?: string;
   onGetStarted?: () => void;
   onSignIn?: () => void;
@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
   const navigation = useMemo(() => getNavigation(), [isAuthenticated, isEmployer, isJobSeeker, currentView, theme]);
 
   // Memoize handlers
-  const handleNavigation = useCallback((view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings') => {
+  const handleNavigation = useCallback((view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'privacy' | 'terms') => {
     if (!isAuthenticated && ['post-job', 'profile', 'dashboard', 'candidates', 'faqs', 'contact', 'settings'].includes(view)) {
       onSignIn?.();
       return;

@@ -28,11 +28,14 @@ import { SettingsPage } from './components/profile/SettingsPage';
 import { NotificationsPage } from './components/notifications/NotificationsPage';
 import { AIChatbot } from './components/common/AIChatbot';
 import { Analytics } from '@vercel/analytics/react';
+import { Footer } from './components/layout/Footer';
+import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
+import { TermsOfService } from './components/legal/TermsOfService';
 
 const AppContent: React.FC = () => {
   console.log('🚀 AppContent component rendering...'); // DEBUG LINE - ADDED
   
-  const [currentView, setCurrentView] = useState<'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms'>('home');
   
   // Add error boundary state
   const [hasError, setHasError] = useState(false);
@@ -40,7 +43,7 @@ const AppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   
   // Wrapper function to log navigation changes
-  const handleNavigate = (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail') => {
+  const handleNavigate = (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms') => {
     console.log('🔄 Navigation requested:', { from: currentView, to: view });
     try {
       setCurrentView(view);
@@ -65,6 +68,16 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     document.documentElement.classList.add('dark');
     document.body.classList.add('dark');
+  }, []);
+
+  // Handle direct URL access to legal pages
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path === '/privacypolicy') {
+      setCurrentView('privacy');
+    } else if (path === '/termsofservice') {
+      setCurrentView('terms');
+    }
   }, []);
 
   useEffect(() => {
@@ -262,6 +275,10 @@ const AppContent: React.FC = () => {
           }
           // Fallback to dashboard if no application selected
           return <EmployerDashboard key={dashboardKey} onNavigate={handleNavigate} />;
+        case 'privacy':
+          return <PrivacyPolicy />;
+        case 'terms':
+          return <TermsOfService />;
         default:
           return <HomePage onGetStarted={handleGetStarted} onSignIn={handleSignIn} onFindJobs={handleFindJobs} onResumeBuilder={handleResumeBuilder} />;
       }
@@ -294,12 +311,15 @@ const AppContent: React.FC = () => {
         ? 'bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 light bg-light-pattern' 
         : 'bg-gradient-to-br from-gray-900 via-gray-900 to-blue-900 dark bg-dark-pattern'
     }`}>
-      <Header 
-        onNavigate={handleNavigate}
-        currentView={currentView}
-        onGetStarted={handleGetStarted}
-        onSignIn={handleSignIn}
-      />
+      {/* Only show Header for non-legal pages */}
+      {!['privacy', 'terms'].includes(currentView) && (
+        <Header 
+          onNavigate={handleNavigate}
+          currentView={currentView}
+          onGetStarted={handleGetStarted}
+          onSignIn={handleSignIn}
+        />
+      )}
       
       {/* Main Content */}
       <main>
@@ -347,6 +367,9 @@ const AppContent: React.FC = () => {
         onGetStarted={handleGetStarted}
       />
 
+      {/* Footer - Only show for non-legal pages */}
+      {!['privacy', 'terms'].includes(currentView) && <Footer />}
+      
       {/* Toast Notifications */}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       

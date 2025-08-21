@@ -188,6 +188,9 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
       const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
       console.log('🔍 Google Client ID:', clientId);
       console.log('🔍 Environment variables:', import.meta.env);
+      console.log('🔍 Window Google object:', (window as any).google);
+      console.log('🔍 Current URL:', window.location.href);
+      console.log('🔍 Port:', window.location.port);
       
       if (!clientId) {
         throw new Error('Google Client ID not found. Please check your environment variables.');
