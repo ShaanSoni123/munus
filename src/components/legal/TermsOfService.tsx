@@ -419,7 +419,7 @@ export const TermsOfService: React.FC = () => {
             <p className={`text-sm ${
               theme === 'light' ? 'text-gray-600' : 'text-gray-400'
             }`}>
-              <strong>Last Updated:</strong> December 2024
+              <strong>Last Updated:</strong> August 2025
             </p>
           </div>
         </div>
