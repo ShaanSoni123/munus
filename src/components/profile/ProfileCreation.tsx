@@ -14,9 +14,12 @@ import { Country, State, City } from 'country-state-city';
 import { api } from '../../services/api';
 import { track } from '@vercel/analytics';
 
+type ViewType = 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms' | 'google-callback';
+
 interface ProfileCreationProps {
-  onComplete: () => void;
+  onComplete: (userData: any) => void;
   onBack: () => void;
+  onNavigate?: (view: ViewType) => void;
 }
 
 interface ProfileData {
@@ -77,7 +80,7 @@ const employerSteps = [
   { id: 'complete', name: 'Complete', icon: CheckCircle },
 ];
 
-export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, onBack }) => {
+export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, onBack, onNavigate }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [profileData, setProfileData] = useState<ProfileData>({
     userType: '' as 'jobseeker' | 'employer',
@@ -196,21 +199,39 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
         throw new Error('Google Client ID not found. Please check your environment variables.');
       }
       
-      // Initialize Google OAuth client
-      if (!(window as any).google) {
-        throw new Error('Google OAuth not available. Please refresh the page and try again.');
+      // Wait for Google OAuth to be available
+      let retries = 0;
+      const maxRetries = 10;
+      
+      while (!(window as any).google?.accounts?.oauth2 && retries < maxRetries) {
+        console.log(`⏳ Waiting for Google OAuth to load... (attempt ${retries + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        retries++;
       }
+      
+      if (!(window as any).google?.accounts?.oauth2) {
+        throw new Error('Google OAuth failed to load. Please refresh the page and try again.');
+      }
+
+      console.log('✅ Google OAuth is ready');
 
       // Create Google OAuth client for authentication
       const client = (window as any).google.accounts.oauth2.initTokenClient({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
+        client_id: clientId,
         scope: 'openid email profile',
+        prompt: 'select_account',
         callback: async (response: any) => {
+          console.log('🔍 OAuth callback response:', response);
+          
           if (response.error) {
-            throw new Error('Google authentication failed: ' + response.error);
+            console.error('❌ OAuth error:', response.error);
+            setErrors({ general: `Google authentication failed: ${response.error}` });
+            return;
           }
 
           try {
+            console.log('✅ OAuth successful, getting user info...');
+            
             // Get user info from Google
             const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
               headers: {
@@ -219,10 +240,14 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
             });
 
             if (!userInfoResponse.ok) {
-              throw new Error('Failed to get user info from Google');
+              throw new Error(`Failed to get user info: ${userInfoResponse.status} ${userInfoResponse.statusText}`);
             }
 
             const userInfo = await userInfoResponse.json();
+            console.log('✅ User info received:', userInfo);
+            
+            // Store Google user info in sessionStorage for the callback handler
+            sessionStorage.setItem('googleUserInfo', JSON.stringify(userInfo));
             
             // Auto-fill profile data with Google info
             setProfileData(prev => ({
@@ -242,18 +267,24 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
               step: currentStep + 1
             });
 
+            // If we have navigation, redirect to google-callback for proper handling
+            if (onNavigate) {
+              onNavigate('google-callback');
+            }
+
           } catch (error) {
-            console.error('Error getting user info:', error);
+            console.error('❌ Error getting user info:', error);
             setErrors({ general: 'Failed to get user information from Google. Please try again.' });
           }
         }
       });
 
+      console.log('🚀 Requesting Google OAuth access token...');
       // Request access token
       client.requestAccessToken();
       
     } catch (error: any) {
-      console.error('Google sign-in error:', error);
+      console.error('❌ Google sign-in error:', error);
       setErrors({ general: error.message || 'Google sign-in failed. Please try again.' });
     } finally {
       setIsSubmitting(false);
@@ -466,7 +497,7 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
       await new Promise(resolve => setTimeout(resolve, 300));
       
       console.log('🎯 Calling onComplete to redirect...');
-      onComplete();
+      onComplete(result);
     } catch (error: any) {
       console.error('❌ Registration error details:', error);
       

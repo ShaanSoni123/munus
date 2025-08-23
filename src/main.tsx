@@ -6,19 +6,31 @@ import './types/google.d.ts';
 
 // Load Google APIs
 const loadGoogleAPIs = () => {
-  // Google API client library
-  const gapiScript = document.createElement('script');
-  gapiScript.src = 'https://apis.google.com/js/api.js';
-  gapiScript.async = true;
-  gapiScript.defer = true;
-  document.head.appendChild(gapiScript);
-
-  // Google OAuth2 client library
+  // Google Identity Services library (for OAuth 2.0)
   const oauthScript = document.createElement('script');
   oauthScript.src = 'https://accounts.google.com/gsi/client';
   oauthScript.async = true;
   oauthScript.defer = true;
+  oauthScript.onload = () => {
+    console.log('✅ Google Identity Services loaded successfully');
+  };
+  oauthScript.onerror = (error) => {
+    console.error('❌ Failed to load Google Identity Services:', error);
+  };
   document.head.appendChild(oauthScript);
+
+  // Google API client library (for other Google APIs)
+  const gapiScript = document.createElement('script');
+  gapiScript.src = 'https://apis.google.com/js/api.js';
+  gapiScript.async = true;
+  gapiScript.defer = true;
+  gapiScript.onload = () => {
+    console.log('✅ Google API client loaded successfully');
+  };
+  gapiScript.onerror = (error) => {
+    console.error('❌ Failed to load Google API client:', error);
+  };
+  document.head.appendChild(gapiScript);
 };
 
 // Apply dark theme by default

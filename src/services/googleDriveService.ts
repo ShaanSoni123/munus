@@ -199,9 +199,17 @@ class GoogleDriveService {
 // Create singleton instance
 const googleDriveService = new GoogleDriveService({
   clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
-  apiKey: import.meta.env.VITE_GOOGLE_API_KEY || '',
+  apiKey: '', // Not needed for basic OAuth
   scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.file',
   discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
 });
+
+// Add debug logging
+if (import.meta.env.DEV) {
+  console.log('🔍 Google Drive Service Config:', {
+    clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID ? '✅ Set' : '❌ Missing',
+    scope: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.file',
+  });
+}
 
 export default googleDriveService; 

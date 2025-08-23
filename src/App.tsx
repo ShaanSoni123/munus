@@ -31,11 +31,12 @@ import { Analytics } from '@vercel/analytics/react';
 import { Footer } from './components/layout/Footer';
 import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
 import { TermsOfService } from './components/legal/TermsOfService';
+import GoogleOAuthCallback from './components/auth/GoogleOAuthCallback';
 
 const AppContent: React.FC = () => {
   console.log('🚀 AppContent component rendering...'); // DEBUG LINE - ADDED
   
-  const [currentView, setCurrentView] = useState<'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms' | 'google-callback'>('home');
   
   // Add error boundary state
   const [hasError, setHasError] = useState(false);
@@ -43,7 +44,7 @@ const AppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   
   // Wrapper function to log navigation changes
-  const handleNavigate = (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms') => {
+  const handleNavigate = (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms' | 'google-callback') => {
     console.log('🔄 Navigation requested:', { from: currentView, to: view });
     try {
       setCurrentView(view);
@@ -77,6 +78,8 @@ const AppContent: React.FC = () => {
       setCurrentView('privacy');
     } else if (path === '/termsofservice') {
       setCurrentView('terms');
+    } else if (path === '/google-callback') {
+      setCurrentView('google-callback');
     }
   }, []);
 
@@ -172,11 +175,14 @@ const AppContent: React.FC = () => {
       switch (currentView) {
         case 'home':
           return <HomePage onGetStarted={handleGetStarted} onSignIn={handleSignIn} onFindJobs={handleFindJobs} onResumeBuilder={handleResumeBuilder} />;
+        case 'google-callback':
+          return <GoogleOAuthCallback onNavigate={handleNavigate} />;
         case 'create-profile':
           return (
             <ProfileCreation 
               onComplete={handleProfileCreationComplete}
               onBack={handleProfileCreationBack}
+              onNavigate={handleNavigate}
             />
           );
         case 'jobs':

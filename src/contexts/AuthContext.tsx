@@ -6,6 +6,7 @@ import type { User } from '../types';
 interface AuthContextValue {
   user: User | null;
   login: (email: string, password: string, role: 'jobseeker' | 'employer') => Promise<void>;
+  loginWithGoogle: (googleUserInfo: any) => Promise<void>;
   register: (userData: RegisterRequest) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -82,7 +83,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
     
     // Listen for localStorage changes and force auth refresh
-    const handleStorageChange = (e) => {
+    const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'skillglide-user' || e.key === 'skillglide-access-token') {
         console.log('🔄 Storage change detected, reinitializing auth...');
         setTimeout(initializeAuth, 100);
@@ -187,6 +188,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     authService.setCurrentUser(userData);
   };
 
+  const loginWithGoogle = async (googleUserInfo: any) => {
+    console.log('🔐 AuthContext loginWithGoogle called with:', googleUserInfo);
+    setLoading(true);
+    
+    try {
+      // For now, create a temporary user object with Google info
+      // User will complete profile creation to set their role and other details
+      const tempUser: User = {
+        id: `temp_${Date.now()}`,
+        email: googleUserInfo.email,
+        name: `${googleUserInfo.given_name || ''} ${googleUserInfo.family_name || ''}`.trim() || 'Google User',
+        role: 'jobseeker', // Default role, can be changed in profile creation
+        avatar_url: googleUserInfo.picture || '',
+        is_active: true,
+        is_verified: false,
+        email_verified: true, // Google emails are verified
+        created_at: new Date().toISOString(),
+        last_login: new Date().toISOString()
+      };
+      
+      console.log('🆕 New Google user, created temp user:', tempUser);
+      setUser(tempUser);
+      authService.setCurrentUser(tempUser);
+      
+    } catch (error) {
+      console.error('❌ Google login error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Debug role detection
   const isJobSeeker = user?.role === 'jobseeker';
   const isEmployer = user?.role === 'employer';
@@ -210,6 +243,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       value={{
         user,
         login,
+        loginWithGoogle,
         register,
         logout,
         refreshUser,
