@@ -11,7 +11,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@types/react-router-dom": "^5.3.3",
     "@vercel/analytics": "^1.5.0",
     "axios": "^1.10.0",
     "country-state-city": "^3.2.1",
