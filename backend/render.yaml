@@ -11,7 +11,7 @@ services:
       - key: MONGODB_URI
         sync: false
       - key: MONGODB_DB_NAME
-        value: munus
+        value: jobify
       - key: SECRET_KEY
         sync: false
       - key: ALGORITHM
@@ -21,9 +21,9 @@ services:
       - key: REFRESH_TOKEN_EXPIRE_DAYS
         value: 7
       - key: BACKEND_CORS_ORIGINS
-        value: '["https://www.gomunus.com","https://gomunus.com","https://munus-nu.vercel.app"]'
+        value: '["https://munus-nu.vercel.app","https://gomunus.com","https://www.gomunus.com"]'
       - key: OPENAI_API_KEY
-        value: your-openai-api-key-here
+        sync: false
       - key: ENVIRONMENT
         value: production
       - key: DEBUG
@@ -33,4 +33,20 @@ services:
       - key: PROJECT_NAME
         value: Munus API
       - key: VERSION
-        value: 1.0.0 
+        value: 1.0.0
+      - key: FRONTEND_URL
+        value: https://munus-nu.vercel.app
+      - key: BACKEND_URL
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false 

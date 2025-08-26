@@ -16,7 +16,6 @@ from app.api.v1.endpoints import (
     contact, jobs, mongodb_jobs, notifications, users, companies
 )
 from pydantic import BaseModel
-from twilio.rest import Client
 import os
 from dotenv import load_dotenv
 from fastapi.staticfiles import StaticFiles
@@ -36,18 +35,24 @@ app = FastAPI(
     openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
 
-# Twilio setup
-account_sid = os.getenv("TWILIO_ACCOUNT_SID", "")
-auth_token = os.getenv("TWILIO_AUTH_TOKEN", "")
-verify_sid = os.getenv("TWILIO_VERIFY_SID", "")
-client = Client(account_sid, auth_token)
+# CORS middleware - Production ready
+allowed_origins = []
+if settings.ENVIRONMENT == "development":
+    allowed_origins = ["*"]
+else:
+    # Production origins - Update these with your actual frontend URLs
+    allowed_origins = [
+        "https://munus-nu.vercel.app",
+        "https://gomunus.com", 
+        "https://www.gomunus.com",
+        settings.FRONTEND_URL
+    ]
 
-# CORS middleware - FIXED FOR DEVELOPMENT
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
-    allow_credentials=False,  # Set to False when using wildcard
-    allow_methods=["*"],
+    allow_origins=allowed_origins,
+    allow_credentials=True if settings.ENVIRONMENT != "development" else False,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
 

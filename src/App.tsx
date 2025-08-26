@@ -31,7 +31,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { Footer } from './components/layout/Footer';
 import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
 import { TermsOfService } from './components/legal/TermsOfService';
-import { GoogleOAuthCallback } from './components/auth/GoogleOAuthCallback';
+import GoogleOAuthCallback from '@/components/auth/GoogleOAuthCallback';
 
 const AppContent: React.FC = () => {
   console.log('🚀 AppContent component rendering...'); // DEBUG LINE - ADDED

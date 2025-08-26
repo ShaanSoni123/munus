@@ -1,10 +1,16 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   base: '/',
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, './src'),
+    },
+  },
   build: {
     outDir: 'dist',
     sourcemap: false,
@@ -12,7 +18,9 @@ export default defineConfig({
       output: {
         manualChunks: undefined
       }
-    }
+    },
+    target: 'esnext',
+    minify: 'esbuild'
   },
   server: {
     port: 5174,

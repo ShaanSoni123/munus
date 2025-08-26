@@ -6,7 +6,7 @@ from app.schemas.mongodb_schemas import (
     JobSearchRequest, JobApplicationRequest, JobStatus, ApplicationStatus
 )
 from app.api.deps import get_current_user
-from app.models.user import User
+from app.schemas.mongodb_schemas import MongoDBUser as User
 from app.db.mongodb import connect_to_mongo
 import logging
 

@@ -23,12 +23,8 @@ target_metadata = None
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-OPENAI_API_KEY = "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"
-
-TWILIO_ACCOUNT_SID = "ACb25c84b25b2c2db3939e036ee73c57b4"
-TWILIO_AUTH_TOKEN = "325a9c61c38c7603f52dc5bd4208c998"
-TWILIO_PHONE_NUMBER = "+18777804236"
-OTP_EXPIRY_MINUTES = 5
+# API keys should be loaded from environment variables, not hardcoded
+# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 
 def run_migrations_offline() -> None:

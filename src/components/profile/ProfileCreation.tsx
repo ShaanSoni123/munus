@@ -184,110 +184,32 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
 
   const handleGoogleSignIn = async () => {
     try {
-      setIsSubmitting(true);
-      setErrors({});
-      
-      // Debug: Log the client ID
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-      console.log('🔍 Google Client ID:', clientId);
-      console.log('🔍 Environment variables:', import.meta.env);
-      console.log('🔍 Window Google object:', (window as any).google);
-      console.log('🔍 Current URL:', window.location.href);
-      console.log('🔍 Port:', window.location.port);
-      
-      if (!clientId) {
-        throw new Error('Google Client ID not found. Please check your environment variables.');
-      }
-      
-      // Wait for Google OAuth to be available
-      let retries = 0;
-      const maxRetries = 10;
-      
-      while (!(window as any).google?.accounts?.oauth2 && retries < maxRetries) {
-        console.log(`⏳ Waiting for Google OAuth to load... (attempt ${retries + 1}/${maxRetries})`);
-        await new Promise(resolve => setTimeout(resolve, 500));
-        retries++;
-      }
-      
-      if (!(window as any).google?.accounts?.oauth2) {
-        throw new Error('Google OAuth failed to load. Please refresh the page and try again.');
+      // Check if user has selected a role
+      if (!profileData.userType) {
+        alert('Please select your role (Job Seeker or Employer) before signing in with Google');
+        return;
       }
 
-      console.log('✅ Google OAuth is ready');
-
-      // Create Google OAuth client for authentication
-      const client = (window as any).google.accounts.oauth2.initTokenClient({
-        client_id: clientId,
-        scope: 'openid email profile',
-        prompt: 'select_account',
-        callback: async (response: any) => {
-          console.log('🔍 OAuth callback response:', response);
-          
-          if (response.error) {
-            console.error('❌ OAuth error:', response.error);
-            setErrors({ general: `Google authentication failed: ${response.error}` });
-            return;
-          }
-
-          try {
-            console.log('✅ OAuth successful, getting user info...');
-            
-            // Get user info from Google
-            const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-              headers: {
-                'Authorization': `Bearer ${response.access_token}`
-              }
-            });
-
-            if (!userInfoResponse.ok) {
-              throw new Error(`Failed to get user info: ${userInfoResponse.status} ${userInfoResponse.statusText}`);
-            }
-
-            const userInfo = await userInfoResponse.json();
-            console.log('✅ User info received:', userInfo);
-            
-            // Store Google user info in sessionStorage for the callback handler
-            sessionStorage.setItem('googleUserInfo', JSON.stringify(userInfo));
-            
-            // Auto-fill profile data with Google info
-            setProfileData(prev => ({
-              ...prev,
-              firstName: userInfo.given_name || '',
-              lastName: userInfo.family_name || '',
-              email: userInfo.email || '',
-              profilePicture: userInfo.picture || ''
-            }));
-
-            // Move to next step (personal info)
-            setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
-            
-            // Track successful Google sign-in
-            track('profile_creation_google_signin_success', {
-              user_type: profileData.userType,
-              step: currentStep + 1
-            });
-
-            // If we have navigation, redirect to google-callback for proper handling
-            if (onNavigate) {
-              onNavigate('google-callback');
-            }
-
-          } catch (error) {
-            console.error('❌ Error getting user info:', error);
-            setErrors({ general: 'Failed to get user information from Google. Please try again.' });
-          }
-        }
-      });
-
-      console.log('🚀 Requesting Google OAuth access token...');
-      // Request access token
-      client.requestAccessToken();
+      console.log('🚀 Starting Google OAuth flow...');
       
+      // Store user type in localStorage for the callback
+      localStorage.setItem('pendingGoogleSignIn', JSON.stringify({ userType: profileData.userType }));
+
+      // Google OAuth flow - redirect to Google's authorization page
+      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+        `client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&` +
+        `redirect_uri=${encodeURIComponent(window.location.origin + '/google-callback')}&` +
+        `response_type=code&` +
+        `scope=openid email profile&` +
+        `state=${encodeURIComponent(JSON.stringify({ userType: profileData.userType }))}`;
+
+      console.log('🔗 Redirecting to Google OAuth:', googleAuthUrl);
+      
+      // Redirect to Google OAuth
+      window.location.href = googleAuthUrl;
     } catch (error: any) {
-      console.error('❌ Google sign-in error:', error);
-      setErrors({ general: error.message || 'Google sign-in failed. Please try again.' });
-    } finally {
-      setIsSubmitting(false);
+      console.error('❌ Error in Google Sign-in:', error);
+      alert('Error initiating Google Sign-in: ' + error.message);
     }
   };
 

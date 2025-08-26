@@ -194,4 +194,191 @@ async def get_current_user(users_collection=Depends(get_users_db)):
         raise HTTPException(status_code=500, detail=f"Failed to get user info: {str(e)}")
 
 
+# Google OAuth endpoints
+@router.get("/google/url")
+async def get_google_auth_url():
+    """Get Google OAuth URL for frontend"""
+    try:
+        if not settings.GOOGLE_CLIENT_ID:
+            raise HTTPException(status_code=500, detail="Google OAuth not configured")
+        
+        # Frontend will handle the OAuth flow using Google's client library
+        return {
+            "client_id": settings.GOOGLE_CLIENT_ID,
+            "redirect_uri": settings.GOOGLE_REDIRECT_URI
+        }
+    except Exception as e:
+        logger.error(f"Error getting Google auth URL: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get Google auth URL")
+
+
+@router.post("/google/callback")
+async def google_oauth_callback(auth_data: dict, users_collection=Depends(get_users_db)):
+    """Handle Google OAuth callback with authorization code"""
+    try:
+        logger.info("Google OAuth callback received")
+        
+        # Get the authorization code and user type
+        code = auth_data.get("code")
+        user_type = auth_data.get("user_type", "jobseeker")
+        
+        if not code:
+            raise HTTPException(status_code=400, detail="Authorization code is required")
+        
+        logger.info(f"Processing Google OAuth for user type: {user_type}")
+        
+        # Exchange authorization code for access token
+        user_info = await exchange_google_code_for_user_info(code)
+        if not user_info:
+            raise HTTPException(status_code=400, detail="Failed to get user info from Google")
+        
+        logger.info(f"Google user info: {user_info.get('email')}")
+        
+        # Check if user already exists
+        existing_user = await users_collection.find_one({"email": user_info["email"]})
+        
+        if existing_user:
+            # User exists, log them in
+            logger.info(f"Existing user logging in via Google: {user_info['email']}")
+            user_response = existing_user.copy()
+            user_response.pop("password", None)
+            if "_id" in user_response:
+                user_response["_id"] = str(user_response["_id"])
+            
+            # Create JWT token
+            access_token = create_access_token({"sub": existing_user["email"], "role": existing_user["role"]})
+            
+            return {
+                "access_token": access_token,
+                "user": user_response,
+                "is_new_user": False
+            }
+        else:
+            # Create new user
+            logger.info(f"Creating new user via Google: {user_info['email']}")
+            
+            user_doc = {
+                "email": user_info["email"],
+                "name": f"{user_info.get('given_name', '')} {user_info.get('family_name', '')}".strip(),
+                "role": user_type,
+                "avatar_url": user_info.get("picture"),
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
+                "last_active": datetime.utcnow(),
+                "is_active": True,
+                "is_verified": True,  # Google accounts are pre-verified
+                "email_verified": True,
+                "google_id": user_info.get("id"),
+            }
+            
+            # Add role-specific fields
+            if user_type == "employer":
+                user_doc.update({
+                    "company_name": None,
+                    "jobs_posted": 0,
+                    "company_id": None,
+                })
+            else:
+                user_doc.update({
+                    "skills": [],
+                    "experience_years": None,
+                    "preferred_job_types": [],
+                    "preferred_locations": [],
+                    "salary_expectations": None,
+                    "jobs_applied": 0,
+                    "profile_views": 0,
+                })
+            
+            # Insert user into database
+            result = await users_collection.insert_one(user_doc)
+            user_doc["_id"] = str(result.inserted_id)
+            
+            # Create JWT token
+            access_token = create_access_token({"sub": user_doc["email"], "role": user_doc["role"]})
+            
+            user_response = user_doc.copy()
+            user_response.pop("password", None)
+            
+            return {
+                "access_token": access_token,
+                "user": user_response,
+                "is_new_user": True
+            }
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in Google OAuth callback: {e}")
+        raise HTTPException(status_code=500, detail="Google authentication failed")
+
+
+async def exchange_google_code_for_user_info(code: str):
+    """Exchange Google OAuth authorization code for user info"""
+    try:
+        import httpx
+        
+        async with httpx.AsyncClient() as client:
+            # Exchange authorization code for access token
+            token_response = await client.post(
+                "https://oauth2.googleapis.com/token",
+                data={
+                    "client_id": settings.GOOGLE_CLIENT_ID,
+                    "client_secret": settings.GOOGLE_CLIENT_SECRET,
+                    "code": code,
+                    "grant_type": "authorization_code",
+                    "redirect_uri": settings.GOOGLE_REDIRECT_URI
+                }
+            )
+            
+            if token_response.status_code != 200:
+                logger.error(f"Failed to exchange code for token: {token_response.text}")
+                return None
+            
+            token_data = token_response.json()
+            access_token = token_data.get("access_token")
+            
+            if not access_token:
+                logger.error("No access token received from Google")
+                return None
+            
+            # Get user info using the access token
+            user_info_response = await client.get(
+                "https://www.googleapis.com/oauth2/v2/userinfo",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )
+            
+            if user_info_response.status_code != 200:
+                logger.error(f"Failed to get user info: {user_info_response.text}")
+                return None
+            
+            user_info = user_info_response.json()
+            logger.info(f"Retrieved user info from Google: {user_info.get('email')}")
+            return user_info
+            
+    except Exception as e:
+        logger.error(f"Error exchanging Google code for user info: {e}")
+        return None
+
+
+async def fetch_google_user_info(access_token: str):
+    """Fetch user info from Google using access token"""
+    try:
+        import httpx
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://www.googleapis.com/oauth2/v2/userinfo",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )
+            
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.error(f"Google API error: {response.status_code} - {response.text}")
+                return None
+                
+    except Exception as e:
+        logger.error(f"Error fetching Google user info: {e}")
+        return None
+
+
 # Password reset endpoints would need to be re-implemented for MongoDB as well, but are omitted for brevity.

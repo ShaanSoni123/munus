@@ -86,7 +86,7 @@ class MongoDBJob(BaseModel):
     employer_name: Optional[str] = None
     
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -129,7 +129,7 @@ class MongoDBJobApplication(BaseModel):
     github_url: Optional[str] = None
     
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -183,7 +183,7 @@ class MongoDBCompany(BaseModel):
     verification_date: Optional[datetime] = None
     
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -238,7 +238,7 @@ class MongoDBUser(BaseModel):
     last_active: Optional[datetime] = None
     
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -265,7 +265,7 @@ class MongoDBNotification(BaseModel):
     read_at: Optional[datetime] = None
     
     class Config:
-        allow_population_by_field_name = True
+        populate_by_name = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }

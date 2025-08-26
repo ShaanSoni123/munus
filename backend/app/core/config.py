@@ -63,6 +63,14 @@ class Settings(BaseSettings):
     MONGODB_URI: str = "mongodb+srv://shaansoni21:L7H0k0nER4DjEM1D@munusdb.f8c3gzf.mongodb.net/?retryWrites=true&w=majority&appName=Munusdb"
     MONGODB_DB_NAME: str = "jobify"
 
+    # Google OAuth Configuration
+    GOOGLE_CLIENT_ID: Optional[str] = None
+    GOOGLE_CLIENT_SECRET: Optional[str] = None
+    GOOGLE_REDIRECT_URI: Optional[str] = None
+
+    # Frontend Configuration
+    FRONTEND_URL: str = "http://localhost:5173"
+
     # ✅ This is what makes .env auto-load
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

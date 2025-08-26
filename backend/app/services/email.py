@@ -33,7 +33,9 @@ def send_email(to_email: str, subject: str, body: str, is_html: bool = False):
 
 def send_password_reset_email(email: str, reset_token: str):
     """Send password reset email"""
-    reset_url = f"http://localhost:3000/reset-password?token={reset_token}"
+    from app.core.config import settings
+    frontend_url = settings.FRONTEND_URL if settings.ENVIRONMENT == "development" else "https://munus-nu.vercel.app"
+    reset_url = f"{frontend_url}/reset-password?token={reset_token}"
     
     subject = "Password Reset - SkillGlide"
     body = f"""
@@ -56,6 +58,8 @@ def send_password_reset_email(email: str, reset_token: str):
 
 def send_welcome_email(email: str, name: str):
     """Send welcome email to new users"""
+    from app.core.config import settings
+    frontend_url = settings.FRONTEND_URL if settings.ENVIRONMENT == "development" else "https://munus-nu.vercel.app"
     subject = "Welcome to SkillGlide!"
     body = f"""
     <html>
@@ -70,7 +74,7 @@ def send_welcome_email(email: str, name: str):
                 <li>Connect with top employers</li>
             </ul>
             <p>Get started by completing your profile and uploading your resume.</p>
-            <a href="http://localhost:3000/profile" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Complete Profile</a>
+            <a href="{frontend_url}/profile" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Complete Profile</a>
             <br><br>
             <p>Best regards,<br>The SkillGlide Team</p>
         </body>

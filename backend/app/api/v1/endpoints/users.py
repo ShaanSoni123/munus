@@ -1,25 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-# from sqlalchemy.orm import Session  # Removed for MongoDB-only setup
-from app.db.database import get_db
 from app.api.deps import get_current_user
-from app.models.user import User
+from app.schemas.mongodb_schemas import MongoDBUser as User
 from app.schemas.user import UserResponse, UserUpdate
-from app.crud.user import update_user
+from app.db.mongodb import get_users_collection
 from pydantic import BaseModel
 from typing import Dict
 import random
 import time
 from datetime import datetime, timedelta
-from twilio.rest import Client
 from app.core.config import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 # In-memory store for OTPs with expiry (for demo only - use Redis in production)
 otp_store: Dict[str, Dict[str, any]] = {}
-
-# Initialize Twilio client
-twilio_client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
 
 class SendOtpRequest(BaseModel):
     phone: str
@@ -37,22 +34,40 @@ def get_current_user_profile(
 
 
 @router.put("/me", response_model=UserResponse)
-def update_current_user_profile(
+async def update_current_user_profile(
     user_data: UserUpdate,
-    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """Update current user profile"""
     try:
-        updated_user = update_user(db, user_id=current_user.id, user_data=user_data)
-        if not updated_user:
+        users_collection = get_users_collection()
+        
+        # Convert user_data to dict and exclude None values
+        update_data = user_data.dict(exclude_unset=True)
+        update_data["updated_at"] = datetime.utcnow()
+        
+        # Update user in MongoDB
+        result = await users_collection.update_one(
+            {"_id": current_user.id},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="User not found"
             )
-        return updated_user
+        
+        # Get updated user
+        updated_user_doc = await users_collection.find_one({"_id": current_user.id})
+        updated_user_doc["_id"] = str(updated_user_doc["_id"])
+        
+        return UserResponse(**updated_user_doc)
+        
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Error updating user profile: {e}")
+        logger.error(f"Error updating user profile: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to update profile"
@@ -64,16 +79,16 @@ class ChangePasswordRequest(BaseModel):
     new_password: str
 
 @router.post("/change-password")
-def change_password(
+async def change_password(
     password_data: ChangePasswordRequest,
-    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     """Change user password"""
     import bcrypt
-    from app.crud.user import update_user_password
     
     try:
+        users_collection = get_users_collection()
+        
         # Verify current password - MongoDB stores it as "password" field
         if not bcrypt.checkpw(password_data.current_password.encode("utf-8"), current_user.password.encode("utf-8")):
             raise HTTPException(
@@ -83,19 +98,24 @@ def change_password(
         
         # Update password - MongoDB stores it as "password" field
         hashed_password = bcrypt.hashpw(password_data.new_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-        success = update_user_password(db, user_id=current_user.id, hashed_password=hashed_password)
         
-        if not success:
+        result = await users_collection.update_one(
+            {"_id": current_user.id},
+            {"$set": {"password": hashed_password, "updated_at": datetime.utcnow()}}
+        )
+        
+        if result.modified_count == 0:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to update password"
             )
         
         return {"message": "Password updated successfully"}
+        
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error changing password: {e}")
+        logger.error(f"Error changing password: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to change password"
@@ -103,26 +123,31 @@ def change_password(
 
 
 @router.delete("/me")
-def delete_current_user_account(
-    db: Session = Depends(get_db),
+async def delete_current_user_account(
     current_user: User = Depends(get_current_user)
 ):
     """Delete current user account"""
-    from app.crud.user import deactivate_user
-    
     try:
-        success = deactivate_user(db, user_id=current_user.id)
-        if not success:
+        users_collection = get_users_collection()
+        
+        # Deactivate user instead of deleting
+        result = await users_collection.update_one(
+            {"_id": current_user.id},
+            {"$set": {"is_active": False, "updated_at": datetime.utcnow()}}
+        )
+        
+        if result.modified_count == 0:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to delete account"
             )
         
         return {"message": "Account deleted successfully"}
+        
     except HTTPException:
         raise
     except Exception as e:
-        print(f"Error deleting account: {e}")
+        logger.error(f"Error deleting account: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete account"
@@ -130,9 +155,8 @@ def delete_current_user_account(
 
 
 @router.post("/verify-email")
-def verify_email(
-    token: str,
-    db: Session = Depends(get_db)
+async def verify_email(
+    token: str
 ):
     """Verify user email"""
     # TODO: Implement email verification logic
@@ -161,19 +185,16 @@ async def send_otp(data: SendOtpRequest):
             "attempts": 0
         }
         
-        # Send SMS via Twilio
-        message = twilio_client.messages.create(
-            body=f"Your SkillGlide verification code is: {otp}. Valid for {settings.OTP_EXPIRY_MINUTES} minutes.",
-            from_=settings.TWILIO_PHONE_NUMBER,
-            to=data.phone
-        )
+        # SMS functionality removed - Twilio not configured
+        # In production, you would integrate with an SMS service here
+        print(f"OTP for {data.phone}: {otp}")  # For development/testing only
         
         print(f"OTP sent to {data.phone}: {otp}")  # For debugging
         
         return {
             "success": True, 
             "message": f"OTP sent to {data.phone}",
-            "message_sid": message.sid
+            "otp": otp  # For development/testing only
         }
         
     except Exception as e:
