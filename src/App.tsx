@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
 import { Header } from './components/layout/Header';
 import { HomePage } from './components/home/HomePage';
 import { ProfileCreation } from './components/profile/ProfileCreation';
@@ -419,9 +418,7 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <JobProvider>
-            <Router>
-              <AppContent />
-            </Router>
+            <AppContent />
           </JobProvider>
         </AuthProvider>
       </ThemeProvider>

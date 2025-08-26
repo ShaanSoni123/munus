@@ -10,10 +10,7 @@ export default defineConfig({
     sourcemap: false,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          ui: ['lucide-react']
-        }
+        manualChunks: undefined
       }
     }
   },
