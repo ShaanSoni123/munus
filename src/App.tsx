@@ -36,7 +36,9 @@ import { GoogleOAuthCallback } from './components/auth/GoogleOAuthCallback';
 const AppContent: React.FC = () => {
   console.log('🚀 AppContent component rendering...'); // DEBUG LINE - ADDED
   
-  const [currentView, setCurrentView] = useState<'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms' | 'google-callback' | 'employer-dashboard' | 'jobseeker-dashboard'>('home');
+  type ViewType = 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms' | 'google-callback' | 'employer-dashboard' | 'jobseeker-dashboard';
+  
+  const [currentView, setCurrentView] = useState<ViewType>('home');
   
   // Add error boundary state
   const [hasError, setHasError] = useState(false);
@@ -44,7 +46,7 @@ const AppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   
   // Wrapper function to log navigation changes
-  const handleNavigate = (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms' | 'google-callback' | 'employer-dashboard' | 'jobseeker-dashboard') => {
+  const handleNavigate = (view: ViewType) => {
     console.log('🔄 Navigation requested:', { from: currentView, to: view });
     try {
       setCurrentView(view);
