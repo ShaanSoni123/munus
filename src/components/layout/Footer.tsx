@@ -6,7 +6,7 @@ interface FooterProps {
   // Footer component no longer needs navigation props
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+export const Footer: React.FC<FooterProps> = () => {
   const { theme } = useTheme();
 
 
