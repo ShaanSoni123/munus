@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { Header } from './components/layout/Header';
 import { HomePage } from './components/home/HomePage';
 import { ProfileCreation } from './components/profile/ProfileCreation';
@@ -34,70 +34,123 @@ import { PrivacyPolicy } from './components/legal/PrivacyPolicy';
 import { TermsOfService } from './components/legal/TermsOfService';
 import { GoogleOAuthCallback } from './components/auth/GoogleOAuthCallback';
 
-// Protected Route Component
-const ProtectedRoute: React.FC<{ children: React.ReactNode; allowedRoles?: string[] }> = ({ 
-  children, 
-  allowedRoles 
-}) => {
-  const { isAuthenticated, user, loading } = useAuth();
-  
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" text="Loading Munus..." />
-      </div>
-    );
-  }
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-  
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return <>{children}</>;
-};
-
-// Main App Content with Routing
 const AppContent: React.FC = () => {
+  console.log('🚀 AppContent component rendering...'); // DEBUG LINE - ADDED
+  
+  const [currentView, setCurrentView] = useState<'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms' | 'google-callback' | 'employer-dashboard' | 'jobseeker-dashboard'>('home');
+  
+  // Add error boundary state
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Wrapper function to log navigation changes
+  const handleNavigate = (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms' | 'google-callback' | 'employer-dashboard' | 'jobseeker-dashboard') => {
+    console.log('🔄 Navigation requested:', { from: currentView, to: view });
+    try {
+      setCurrentView(view);
+      
+      // Update browser URL for internal navigation
+      const urlMap: Record<string, string> = {
+        'home': '/',
+        'jobs': '/jobs',
+        'resume': '/resume',
+        'profile': '/profile',
+        'create-profile': '/create-profile',
+        'dashboard': '/dashboard',
+        'post-job': '/post-job',
+        'candidates': '/candidates',
+        'faqs': '/faqs',
+        'contact': '/contact',
+        'settings': '/settings',
+        'notifications': '/notifications',
+        'application-detail': '/application-detail',
+        'privacy': '/privacy',
+        'terms': '/terms',
+        'google-callback': '/google-callback'
+      };
+      
+      if (urlMap[view]) {
+        window.history.pushState({}, '', urlMap[view]);
+      }
+    } catch (error) {
+      console.error('Navigation error:', error);
+      setHasError(true);
+      setErrorMessage('Navigation failed. Please refresh the page.');
+    }
+  };
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
-  const [dashboardKey, setDashboardKey] = useState(0);
-  const [selectedApplication, setSelectedApplication] = useState<any>(null);
-  const { isAuthenticated, user, loading } = useAuth();
+  const [dashboardKey, setDashboardKey] = useState(0); // Key to force dashboard refresh
+  const [selectedApplication, setSelectedApplication] = useState<any>(null); // Track selected application for detail page
+  const { isAuthenticated, isEmployer, isJobSeeker, user, loading } = useAuth();
   const { theme } = useTheme();
   const { toasts, removeToast } = useToast();
-  const location = useLocation();
-  const navigate = useNavigate();
 
+  // Navigation logic is now handled in the useEffect below
+
+  // Handle authentication state changes
   // Apply dark theme by default
   useEffect(() => {
     document.documentElement.classList.add('dark');
     document.body.classList.add('dark');
   }, []);
 
-  // Handle authentication state changes
+  // Handle direct URL access to legal pages
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path === '/privacypolicy') {
+      setCurrentView('privacy');
+    } else if (path === '/termsofservice') {
+      setCurrentView('terms');
+    } else if (path === '/google-callback') {
+      setCurrentView('google-callback');
+    }
+  }, []);
+
   useEffect(() => {
     if (loading) return;
 
-    // If authenticated and on home page, redirect to dashboard
-    if (isAuthenticated && user && location.pathname === '/') {
-      navigate('/dashboard');
+    console.log('🔄 Auth state check:', { 
+      isAuthenticated, 
+      currentView, 
+      user: user?.email,
+      userRole: user?.role,
+      loading 
+    });
+
+    // Set loading to false after auth check
+    setIsLoading(false);
+
+    // If authenticated and on home page or public pages, go to dashboard
+    if (isAuthenticated && user && ['home', 'jobs', 'faqs', 'contact'].includes(currentView)) {
+      console.log('✅ User authenticated, redirecting to dashboard');
+      setDashboardKey(prev => prev + 1);
+      setCurrentView('dashboard');
     }
     
-    // If not authenticated and on protected page, redirect home
-    if (!isAuthenticated && ['/dashboard', '/post-job', '/candidates', '/profile', '/settings', '/notifications'].includes(location.pathname)) {
-      navigate('/');
+    // If not authenticated and on protected page, go home
+    if (!isAuthenticated && ['dashboard', 'post-job', 'candidates', 'profile', 'settings', 'notifications'].includes(currentView)) {
+      console.log('❌ User not authenticated, going home');
+      setCurrentView('home');
     }
-  }, [isAuthenticated, user, loading, location.pathname, navigate]);
+  }, [isAuthenticated, user, loading, currentView]);
 
   const handleGetStarted = () => {
+    console.log('🚀 handleGetStarted called', {
+      isAuthenticated,
+      user: user?.role
+    });
+    
     if (isAuthenticated && user) {
-      navigate('/dashboard');
+      // User is already authenticated, redirect to dashboard
+      console.log('✅ User authenticated, redirecting to dashboard');
+      setDashboardKey(prev => prev + 1);
+      setCurrentView('dashboard');
     } else {
-      navigate('/create-profile');
+      // User is not authenticated, go to profile creation
+      console.log('📝 User not authenticated, going to profile creation');
+      setCurrentView('create-profile');
     }
   };
 
@@ -107,20 +160,24 @@ const AppContent: React.FC = () => {
   };
 
   const handleProfileCreationComplete = () => {
+    console.log('🎉 Profile creation completed!');
+    // Force refresh dashboard and redirect to dashboard immediately
     setDashboardKey(prev => prev + 1);
-    navigate('/dashboard');
+    setCurrentView('dashboard');
   };
 
   const handleProfileCreationBack = () => {
-    navigate('/');
+    setCurrentView('home');
   };
 
   const handleFindJobs = () => {
-    navigate('/jobs');
+    console.log('🔍 App: Find Jobs clicked');
+    setCurrentView('jobs');
   };
   
   const handleResumeBuilder = () => {
-    navigate('/resume');
+    console.log('📝 App: Resume Builder clicked');
+    setCurrentView('resume');
   };
 
   // Show loading spinner during initial auth check
@@ -138,44 +195,33 @@ const AppContent: React.FC = () => {
     );
   }
 
-  return (
-    <div className={`min-h-screen theme-transition ${
-      theme === 'light' 
-        ? 'bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 light bg-light-pattern' 
-        : 'bg-gradient-to-br from-gray-900 via-gray-900 to-blue-900 dark bg-dark-pattern'
-    }`}>
-      {/* Header - Only show for non-legal pages */}
-      {!['/privacy', '/terms'].includes(location.pathname) && (
-        <Header 
-          onGetStarted={handleGetStarted}
-          onSignIn={handleSignIn}
-        />
-      )}
-      
-      {/* Main Content */}
-      <main>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={
-            <HomePage 
-              onGetStarted={handleGetStarted} 
-              onSignIn={handleSignIn} 
-              onFindJobs={handleFindJobs} 
-              onResumeBuilder={handleResumeBuilder} 
+  const renderContent = () => {
+    try {
+      switch (currentView) {
+        case 'home':
+          return <HomePage onGetStarted={handleGetStarted} onSignIn={handleSignIn} onFindJobs={handleFindJobs} onResumeBuilder={handleResumeBuilder} />;
+        case 'google-callback':
+          return <GoogleOAuthCallback onNavigate={handleNavigate} />;
+        case 'create-profile':
+          return (
+            <ProfileCreation 
+              onComplete={handleProfileCreationComplete}
+              onBack={handleProfileCreationBack}
+              onNavigate={handleNavigate}
             />
-          } />
-          
-          <Route path="/jobs" element={
+          );
+        case 'jobs':
+          return (
             <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ${
               theme === 'light' ? 'bg-light-pattern' : ''
             }`}>
               <div className="space-y-8">
                 <div className="text-center mb-12">
                   <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-                    {isAuthenticated && user?.role === 'employer' ? 'Find Top Candidates' : 'Discover Your Perfect Job'}
+                    {isEmployer ? 'Find Top Candidates' : 'Discover Your Perfect Job'}
                   </h1>
                   <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                    {isAuthenticated && user?.role === 'employer'
+                    {isEmployer 
                       ? 'Browse through talented professionals and find the perfect match for your team'
                       : 'Browse through thousands of opportunities from top companies worldwide'
                     }
@@ -185,159 +231,163 @@ const AppContent: React.FC = () => {
                 <JobList />
               </div>
             </div>
-          } />
+          );
+        case 'resume':
+          return <ResumeBuilder />;
+        case 'dashboard':
+          console.log('🎯 Rendering dashboard for user:', { role: user?.role, isEmployer, isJobSeeker });
           
-          <Route path="/resume" element={<ResumeBuilder />} />
-          <Route path="/faqs" element={<FAQPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsOfService />} />
-          <Route path="/google-callback" element={<GoogleOAuthCallback onNavigate={(view) => navigate('/')} />} />
-          
-          {/* Protected Routes */}
-          <Route path="/create-profile" element={
-            <ProtectedRoute>
-              <ProfileCreation 
-                onComplete={handleProfileCreationComplete}
-                onBack={handleProfileCreationBack}
-                onNavigate={(view) => {
-                  const routeMap: Record<string, string> = {
-                    'home': '/',
-                    'dashboard': '/dashboard'
-                  };
-                  if (routeMap[view]) {
-                    navigate(routeMap[view]);
-                  }
-                }}
-              />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              {user?.role === 'employer' ? (
-                <EmployerDashboard 
-                  key={dashboardKey} 
-                  onNavigate={(view) => {
-                    const routeMap: Record<string, string> = {
-                      'dashboard': '/dashboard',
-                      'post-job': '/post-job',
-                      'candidates': '/candidates',
-                      'profile': '/profile',
-                      'settings': '/settings',
-                      'notifications': '/notifications'
-                    };
-                    if (routeMap[view]) {
-                      navigate(routeMap[view]);
-                    }
-                  }} 
-                  onApplicationSelect={setSelectedApplication} 
-                />
-              ) : (
-                <JobSeekerDashboard 
-                  onNavigate={(view) => {
-                    const routeMap: Record<string, string> = {
-                      'dashboard': '/dashboard',
-                      'profile': '/profile',
-                      'settings': '/settings',
-                      'notifications': '/notifications'
-                    };
-                    if (routeMap[view]) {
-                      navigate(routeMap[view]);
-                    }
-                  }} 
-                />
-              )}
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/post-job" element={
-            <ProtectedRoute allowedRoles={['employer']}>
-              <JobPostingBuilder 
-                onBack={() => navigate('/dashboard')} 
-                onJobPosted={(newJob) => {
-                  console.log('Job posted successfully:', newJob);
-                  setDashboardKey(prev => prev + 1);
-                  navigate('/dashboard');
-                }}
-              />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/candidates" element={
-            <ProtectedRoute allowedRoles={['employer']}>
-              <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ${
-                theme === 'light' ? 'bg-light-pattern' : ''
-              }`}>
-                <div className="space-y-8">
-                  <div className="text-center mb-12">
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-                      Find Top Candidates
-                    </h1>
-                    <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                      Browse through talented professionals and find the perfect match for your team
-                    </p>
-                  </div>
-                  <JobFilters />
-                  <JobList />
+          // Primary check: use user.role directly from database
+          if (user?.role === 'employer') {
+            return <EmployerDashboard key={dashboardKey} onNavigate={handleNavigate} onApplicationSelect={setSelectedApplication} />;
+          } else if (user?.role === 'jobseeker') {
+            return <JobSeekerDashboard onNavigate={handleNavigate} />;
+          } else {
+            // Fallback: use computed properties
+            if (isEmployer) {
+              return <EmployerDashboard key={dashboardKey} onNavigate={handleNavigate} onApplicationSelect={setSelectedApplication} />;
+            } else {
+              // Default to job seeker dashboard
+              return <JobSeekerDashboard onNavigate={handleNavigate} />;
+            }
+          }
+        case 'post-job':
+          return (
+            <JobPostingBuilder 
+              onBack={() => setCurrentView('dashboard')} 
+              onJobPosted={(newJob) => {
+                console.log('Job posted successfully:', newJob);
+                setDashboardKey(prev => prev + 1); // Force dashboard refresh
+                setCurrentView('dashboard');
+              }}
+            />
+          );
+        case 'candidates':
+          return (
+            <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ${
+              theme === 'light' ? 'bg-light-pattern' : ''
+            }`}>
+              <div className="space-y-8">
+                <div className="text-center mb-12">
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                    Find Top Candidates
+                  </h1>
+                  <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                    Browse through talented professionals and find the perfect match for your team
+                  </p>
                 </div>
+                <JobFilters />
+                <JobList />
               </div>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <ProfilePage onNavigate={(view: string) => navigate('/dashboard')} />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/settings" element={
-            <ProtectedRoute>
-              <SettingsPage onNavigate={(view) => {
-                const routeMap: Record<string, string> = {
-                  'dashboard': '/dashboard',
-                  'profile': '/profile'
-                };
-                if (routeMap[view]) {
-                  navigate(routeMap[view]);
-                }
-              }} />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/notifications" element={
-            <ProtectedRoute>
-              <NotificationsPage onNavigate={(view) => {
-                const routeMap: Record<string, string> = {
-                  'dashboard': '/dashboard',
-                  'profile': '/profile'
-                };
-                if (routeMap[view]) {
-                  navigate(routeMap[view]);
-                }
-              }} />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/application-detail" element={
-            <ProtectedRoute allowedRoles={['employer']}>
-              {selectedApplication ? (
-                <ApplicationDetailPage
-                  application={selectedApplication}
-                  onBack={() => navigate('/dashboard')}
-                  onStatusUpdate={(applicationId, status, notes) => {
-                    console.log('Status update:', { applicationId, status, notes });
-                  }}
-                />
-              ) : (
-                <Navigate to="/dashboard" replace />
-              )}
-            </ProtectedRoute>
-          } />
-          
-          {/* Catch all route - redirect to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            </div>
+          );
+        case 'profile':
+          return <ProfilePage onNavigate={setCurrentView} />;
+        case 'faqs':
+          return <FAQPage />;
+        case 'contact':
+          return <ContactPage />;
+        case 'settings':
+          return <SettingsPage onNavigate={handleNavigate} />;
+        case 'notifications':
+          return <NotificationsPage onNavigate={handleNavigate} />;
+        case 'application-detail':
+          if (selectedApplication) {
+            return (
+              <ApplicationDetailPage
+                application={selectedApplication}
+                onBack={() => setCurrentView('dashboard')}
+                onStatusUpdate={(applicationId, status, notes) => {
+                  // Handle status update - could be passed down from dashboard
+                  console.log('Status update:', { applicationId, status, notes });
+                }}
+              />
+            );
+          }
+          // Fallback to dashboard if no application selected
+          return <EmployerDashboard key={dashboardKey} onNavigate={handleNavigate} />;
+        case 'privacy':
+          return <PrivacyPolicy />;
+        case 'terms':
+          return <TermsOfService />;
+        default:
+          return <HomePage onGetStarted={handleGetStarted} onSignIn={handleSignIn} onFindJobs={handleFindJobs} onResumeBuilder={handleResumeBuilder} />;
+      }
+    } catch (error) {
+      console.error('Error rendering content:', error);
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              Something went wrong
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Please refresh the page or try again later.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div className={`min-h-screen theme-transition ${
+      theme === 'light' 
+        ? 'bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 light bg-light-pattern' 
+        : 'bg-gradient-to-br from-gray-900 via-gray-900 to-blue-900 dark bg-dark-pattern'
+    }`}>
+      {/* Only show Header for non-legal pages */}
+      {!['privacy', 'terms'].includes(currentView) && (
+        <Header 
+          onNavigate={handleNavigate}
+          currentView={currentView}
+          onGetStarted={handleGetStarted}
+          onSignIn={handleSignIn}
+        />
+      )}
+      
+      {/* Main Content */}
+      <main>
+        {isLoading ? (
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center p-8">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
+                Loading Munus...
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400">
+                Please wait while we set up your experience
+              </p>
+            </div>
+          </div>
+        ) : hasError ? (
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center p-8">
+              <h2 className="text-2xl font-bold text-red-600 mb-4">
+                Something went wrong
+              </h2>
+              <p className="text-gray-600 mb-4">{errorMessage}</p>
+              <button
+                onClick={() => {
+                  setHasError(false);
+                  setErrorMessage('');
+                  window.location.reload();
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Refresh Page
+              </button>
+            </div>
+          </div>
+        ) : (
+          renderContent()
+        )}
       </main>
 
       {/* Auth Modal */}
@@ -349,13 +399,13 @@ const AppContent: React.FC = () => {
       />
 
       {/* Footer - Only show for non-legal pages */}
-      {!['/privacy', '/terms'].includes(location.pathname) && <Footer />}
+      {!['privacy', 'terms'].includes(currentView) && <Footer />}
       
       {/* Toast Notifications */}
       <ToastContainer toasts={toasts} onRemove={removeToast} />
       
       {/* AI Chatbot - Only show on dashboard and related pages */}
-      {['/dashboard', '/post-job'].includes(location.pathname) && <AIChatbot />}
+      {(currentView === 'dashboard' || currentView === 'post-job') && <AIChatbot />}
       <Analytics />
     </div>
   );

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Menu, X, User, Settings, LogOut, Sun, Moon, Zap, Bell, Home, ChevronDown, HelpCircle, Mail, LayoutDashboard } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Button } from '../ui/Button';
@@ -10,18 +9,20 @@ import { notificationService } from '../../services/notificationService';
 import { useApi } from '../../hooks/useApi';
 
 interface HeaderProps {
+  onNavigate?: (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'privacy' | 'terms') => void;
+  currentView?: string;
   onGetStarted?: () => void;
   onSignIn?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 
+  onNavigate, 
+  currentView, 
   onGetStarted, 
   onSignIn 
 }) => {
   const { user, logout, isAuthenticated, isEmployer, isJobSeeker } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
-  const navigate = useNavigate();
-  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -56,31 +57,31 @@ export const Header: React.FC<HeaderProps> = ({
     };
   }, []);
 
-  // Close mobile menu when location changes
+  // Close mobile menu when view changes
   useEffect(() => {
     setIsMenuOpen(false);
-  }, [location.pathname]);
+  }, [currentView]);
 
   const getNavigation = () => {
     if (!isAuthenticated) {
       return [
-        { name: 'Home', href: '/', icon: Home },
-        { name: 'Find Jobs', href: '/jobs', icon: User },
-        { name: 'Resume Builder', href: '/resume', icon: User },
+        { name: 'Home', href: '#home', view: 'home' as const, icon: Home },
+        { name: 'Find Jobs', href: '#jobs', view: 'jobs' as const, icon: User },
+        { name: 'Resume Builder', href: '#resume', view: 'resume' as const, icon: User },
       ];
     }
 
     if (isEmployer) {
       return [
-        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-        { name: 'Find Candidates', href: '/candidates', icon: User },
+        { name: 'Dashboard', href: '#dashboard', view: 'dashboard' as const, icon: LayoutDashboard },
+        { name: 'Find Candidates', href: '#candidates', view: 'candidates' as const, icon: User },
       ];
     } else if (isJobSeeker) {
       return [
-        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-        { name: 'Find Jobs', href: '/jobs', icon: User },
-        { name: 'Resume Builder', href: '/resume', icon: User },
-        { name: 'My Profile', href: '/profile', icon: User },
+        { name: 'Dashboard', href: '#dashboard', view: 'dashboard' as const, icon: LayoutDashboard },
+        { name: 'Find Jobs', href: '#jobs', view: 'jobs' as const, icon: User },
+        { name: 'Resume Builder', href: '#resume', view: 'resume' as const, icon: User },
+        { name: 'My Profile', href: '#profile', view: 'profile' as const, icon: User },
       ];
     }
 
@@ -88,27 +89,23 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   // Memoize navigation to avoid recalculating on every render
-  const navigation = useMemo(() => getNavigation(), [isAuthenticated, isEmployer, isJobSeeker, location.pathname, theme]);
+  const navigation = useMemo(() => getNavigation(), [isAuthenticated, isEmployer, isJobSeeker, currentView, theme]);
 
   // Memoize handlers
-  const handleNavigation = useCallback((href: string) => {
-    if (!isAuthenticated && ['/post-job', '/profile', '/dashboard', '/candidates', '/faqs', '/contact', '/settings'].includes(href)) {
+  const handleNavigation = useCallback((view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'privacy' | 'terms') => {
+    if (!isAuthenticated && ['post-job', 'profile', 'dashboard', 'candidates', 'faqs', 'contact', 'settings'].includes(view)) {
       onSignIn?.();
       return;
     }
-    navigate(href);
+    onNavigate?.(view);
     setIsMenuOpen(false);
     setIsProfileOpen(false);
-  }, [isAuthenticated, onSignIn, navigate]);
+  }, [isAuthenticated, onSignIn, onNavigate]);
 
   const handleLogout = useCallback(() => {
     setIsProfileOpen(false);
     logout();
-    navigate('/');
-  }, [logout, navigate]);
-
-  // Get current view from location pathname
-  const currentView = location.pathname === '/' ? 'home' : location.pathname.slice(1);
+  }, [logout]);
 
   return (
     <>
@@ -118,7 +115,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Logo */}
             <div className="flex items-center">
               <button 
-                onClick={() => handleNavigation('/')}
+                onClick={() => handleNavigation('home')}
                 className="flex-shrink-0 flex items-center space-x-2 hover:opacity-80 transition-all duration-200 hover:scale-105"
               >
                 <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center transition-all duration-300 shadow-lg shadow-emerald-500/25">
@@ -134,13 +131,12 @@ export const Header: React.FC<HeaderProps> = ({
             <nav className="hidden md:flex space-x-1">
               {navigation.map((item) => {
                 const IconComponent = item.icon;
-                const isActive = location.pathname === item.href;
                 return (
                 <button
                   key={item.name}
-                  onClick={() => handleNavigation(item.href)}
+                  onClick={() => handleNavigation(item.view)}
                   className={`text-gray-300 hover:text-emerald-400 px-4 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-gray-800/50 flex items-center space-x-2 ${
-                    isActive 
+                    currentView === item.view 
                       ? 'text-emerald-400 bg-emerald-900/20' 
                       : ''
                   }`}
@@ -239,7 +235,7 @@ export const Header: React.FC<HeaderProps> = ({
                         
                         <div className="py-2">
                           <button
-                            onClick={() => handleNavigation('/profile')}
+                            onClick={() => handleNavigation('profile')}
                             className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50 transition-colors flex items-center space-x-2"
                           >
                             <User className="w-4 h-4" />
@@ -247,7 +243,7 @@ export const Header: React.FC<HeaderProps> = ({
                           </button>
                           
                           <button
-                            onClick={() => handleNavigation('/settings')}
+                            onClick={() => handleNavigation('settings')}
                             className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50 transition-colors flex items-center space-x-2"
                           >
                             <Settings className="w-4 h-4" />
@@ -255,7 +251,7 @@ export const Header: React.FC<HeaderProps> = ({
                           </button>
                           
                           <button
-                            onClick={() => handleNavigation('/help')}
+                            onClick={() => handleNavigation('help')}
                             className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50 transition-colors flex items-center space-x-2"
                           >
                             <HelpCircle className="w-4 h-4" />
@@ -295,13 +291,12 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="px-2 pt-2 pb-3 space-y-1">
                 {navigation.map((item) => {
                   const IconComponent = item.icon;
-                  const isActive = location.pathname === item.href;
                   return (
                     <button
                       key={item.name}
-                      onClick={() => handleNavigation(item.href)}
+                      onClick={() => handleNavigation(item.view)}
                       className={`w-full text-left px-3 py-2 text-base font-medium rounded-lg transition-colors flex items-center space-x-2 ${
-                        isActive
+                        currentView === item.view
                           ? 'text-emerald-400 bg-emerald-900/20'
                           : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50'
                       }`}
