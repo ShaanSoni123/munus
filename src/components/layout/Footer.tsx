@@ -181,16 +181,11 @@ export const Footer: React.FC<FooterProps> = () => {
         {/* Bottom Section */}
         <div className={`border-t ${
           theme === 'light' ? 'border-gray-200' : 'border-gray-700'
-        } mt-8 pt-8 flex flex-col md:flex-row justify-between items-center`}>
+        } mt-8 pt-8 flex justify-center items-center`}>
           <p className={`text-sm ${
             theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-          } mb-4 md:mb-0`}>
-            © 2024 Munus Technologies Pvt. Ltd. All rights reserved.
-          </p>
-          <p className={`text-sm ${
-            theme === 'light' ? 'text-gray-500' : 'text-gray-400'
-          } flex items-center`}>
-            Made with <Heart className="w-4 h-4 mx-1 text-red-500" /> in India
+          }`}>
+            © 2025 Munus Technologies Pvt. Ltd. All rights reserved.
           </p>
         </div>
       </div>

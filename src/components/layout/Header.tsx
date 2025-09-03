@@ -7,6 +7,7 @@ import { Badge } from '../ui/Badge';
 import { NotificationsPanel } from '../notifications/NotificationsPanel';
 import { notificationService } from '../../services/notificationService';
 import { useApi } from '../../hooks/useApi';
+// import logoImage from '../../assets/Screenshot 2025-08-14 at 12.56.36 AM.png';
 
 interface HeaderProps {
   onNavigate?: (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'privacy' | 'terms') => void;
@@ -118,9 +119,11 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => handleNavigation('home')}
                 className="flex-shrink-0 flex items-center space-x-2 hover:opacity-80 transition-all duration-200 hover:scale-105"
               >
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center transition-all duration-300 shadow-lg shadow-emerald-500/25">
-                  <Zap className="w-5 h-5 text-white" />
-                </div>
+                <img 
+                  src="/src/assets/munus-logo.svg" 
+                  alt="Munus Logo" 
+                  className="w-8 h-8 transition-all duration-300 shadow-lg shadow-emerald-500/25"
+                />
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
                   Munus
                 </h1>
