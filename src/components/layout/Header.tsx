@@ -120,7 +120,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex-shrink-0 flex items-center space-x-2 hover:opacity-80 transition-all duration-200 hover:scale-105"
               >
                 <img 
-                  src="/src/assets/munus-logo.svg" 
+                  src="/Logo.png" 
                   alt="Munus Logo" 
                   className="w-8 h-8 transition-all duration-300 shadow-lg shadow-emerald-500/25"
                 />
