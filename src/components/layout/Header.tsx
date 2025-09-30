@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Menu, X, User, Settings, LogOut, Sun, Moon, Zap, Bell, Home, ChevronDown, HelpCircle, Mail, LayoutDashboard } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Button } from '../ui/Button';
@@ -7,21 +8,15 @@ import { Badge } from '../ui/Badge';
 import { NotificationsPanel } from '../notifications/NotificationsPanel';
 import { notificationService } from '../../services/notificationService';
 import { useApi } from '../../hooks/useApi';
-// import logoImage from '../../assets/Screenshot 2025-08-14 at 12.56.36 AM.png';
+import logoImage from '../../assets/Logo.png';
 
 interface HeaderProps {
-  onNavigate?: (view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'privacy' | 'terms') => void;
-  currentView?: string;
-  onGetStarted?: () => void;
-  onSignIn?: () => void;
+  // Props are now optional since we're using React Router
 }
 
-export const Header: React.FC<HeaderProps> = ({ 
-  onNavigate, 
-  currentView, 
-  onGetStarted, 
-  onSignIn 
-}) => {
+export const Header: React.FC<HeaderProps> = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout, isAuthenticated, isEmployer, isJobSeeker } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,6 +25,9 @@ export const Header: React.FC<HeaderProps> = ({
   const [unreadCount, setUnreadCount] = useState(0);
   
   const profileRef = useRef<HTMLDivElement>(null);
+  
+  // Get current view from location pathname
+  const currentView = location.pathname.replace('/', '') || 'home';
 
   // Memoize the API function to avoid unnecessary re-renders
   const getUnreadCount = useCallback(() => notificationService.getUnreadCount(), []);
@@ -66,23 +64,23 @@ export const Header: React.FC<HeaderProps> = ({
   const getNavigation = () => {
     if (!isAuthenticated) {
       return [
-        { name: 'Home', href: '#home', view: 'home' as const, icon: Home },
-        { name: 'Find Jobs', href: '#jobs', view: 'jobs' as const, icon: User },
-        { name: 'Resume Builder', href: '#resume', view: 'resume' as const, icon: User },
+        { name: 'Home', path: '/', view: 'home' as const, icon: Home },
+        { name: 'Find Jobs', path: '/jobs', view: 'jobs' as const, icon: User },
+        { name: 'Resume Builder', path: '/resume', view: 'resume' as const, icon: User },
       ];
     }
 
     if (isEmployer) {
       return [
-        { name: 'Dashboard', href: '#dashboard', view: 'dashboard' as const, icon: LayoutDashboard },
-        { name: 'Find Candidates', href: '#candidates', view: 'candidates' as const, icon: User },
+        { name: 'Dashboard', path: '/dashboard', view: 'dashboard' as const, icon: LayoutDashboard },
+        { name: 'Find Candidates', path: '/candidates', view: 'candidates' as const, icon: User },
       ];
     } else if (isJobSeeker) {
       return [
-        { name: 'Dashboard', href: '#dashboard', view: 'dashboard' as const, icon: LayoutDashboard },
-        { name: 'Find Jobs', href: '#jobs', view: 'jobs' as const, icon: User },
-        { name: 'Resume Builder', href: '#resume', view: 'resume' as const, icon: User },
-        { name: 'My Profile', href: '#profile', view: 'profile' as const, icon: User },
+        { name: 'Dashboard', path: '/dashboard', view: 'dashboard' as const, icon: LayoutDashboard },
+        { name: 'Find Jobs', path: '/jobs', view: 'jobs' as const, icon: User },
+        { name: 'Resume Builder', path: '/resume', view: 'resume' as const, icon: User },
+        { name: 'My Profile', path: '/profile', view: 'profile' as const, icon: User },
       ];
     }
 
@@ -93,15 +91,23 @@ export const Header: React.FC<HeaderProps> = ({
   const navigation = useMemo(() => getNavigation(), [isAuthenticated, isEmployer, isJobSeeker, currentView, theme]);
 
   // Memoize handlers
-  const handleNavigation = useCallback((view: 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'privacy' | 'terms') => {
-    if (!isAuthenticated && ['post-job', 'profile', 'dashboard', 'candidates', 'faqs', 'contact', 'settings'].includes(view)) {
-      onSignIn?.();
-      return;
-    }
-    onNavigate?.(view);
+  const handleNavigation = useCallback((path: string) => {
+    navigate(path);
     setIsMenuOpen(false);
     setIsProfileOpen(false);
-  }, [isAuthenticated, onSignIn, onNavigate]);
+  }, [navigate]);
+
+  const handleGetStarted = useCallback(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    } else {
+      navigate('/create-profile');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSignIn = useCallback(() => {
+    navigate('/login');
+  }, [navigate]);
 
   const handleLogout = useCallback(() => {
     setIsProfileOpen(false);
@@ -116,14 +122,32 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Logo */}
             <div className="flex items-center">
               <button 
-                onClick={() => handleNavigation('home')}
+                onClick={() => handleNavigation('/')}
                 className="flex-shrink-0 flex items-center space-x-2 hover:opacity-80 transition-all duration-200 hover:scale-105"
               >
-                <img 
-                  src="/Logo.png" 
-                  alt="Munus Logo" 
-                  className="w-8 h-8 transition-all duration-300 shadow-lg shadow-emerald-500/25"
-                />
+                <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg p-1 border-2 border-emerald-400 shadow-lg shadow-emerald-500/25">
+                  <img 
+                    src={logoImage} 
+                    alt="Munus Logo" 
+                    className="w-full h-full object-contain transition-all duration-300"
+                    style={{ minWidth: '30px', minHeight: '30px' }}
+                    onError={(e) => {
+                      console.log('Logo failed to load:', e);
+                      console.log('Logo src:', logoImage);
+                      // Hide image and show fallback
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      const fallback = (e.target as HTMLImageElement).nextElementSibling;
+                      if (fallback) fallback.classList.remove('hidden');
+                    }}
+                    onLoad={() => {
+                      console.log('Logo loaded successfully');
+                      console.log('Logo src:', logoImage);
+                    }}
+                  />
+                  <div className="hidden w-full h-full bg-emerald-400 rounded-md flex items-center justify-center text-white font-bold text-xs">
+                    M
+                  </div>
+                </div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
                   Munus
                 </h1>
@@ -137,9 +161,9 @@ export const Header: React.FC<HeaderProps> = ({
                 return (
                 <button
                   key={item.name}
-                  onClick={() => handleNavigation(item.view)}
+                  onClick={() => handleNavigation(item.path)}
                   className={`text-gray-300 hover:text-emerald-400 px-4 py-2 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-gray-800/50 flex items-center space-x-2 ${
-                    currentView === item.view 
+                    location.pathname === item.path 
                       ? 'text-emerald-400 bg-emerald-900/20' 
                       : ''
                   }`}
@@ -197,18 +221,18 @@ export const Header: React.FC<HeaderProps> = ({
               {!isAuthenticated ? (
                 <div className="flex items-center space-x-3">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    onClick={onSignIn}
-                    className="btn-login border-0 text-white font-semibold shadow-lg"
+                    onClick={handleSignIn}
+                    className="btn-login !border-2 !border-white/30 !text-white !font-semibold !shadow-lg hover:!bg-white/10 hover:!border-white/50 !transition-all !duration-200 !bg-transparent !backdrop-blur-sm"
                   >
                     Log In
                   </Button>
                   <Button
-                    variant="primary"
+                    variant="ghost"
                     size="sm"
-                    onClick={onGetStarted}
-                    className="btn-get-started border-0 text-white font-semibold shadow-lg"
+                    onClick={handleGetStarted}
+                    className="btn-get-started !border-0 !text-white !font-semibold !shadow-lg !bg-gradient-to-r !from-emerald-500 !to-cyan-500 hover:!from-emerald-600 hover:!to-cyan-600 !transition-all !duration-200"
                   >
                     Get Started
                   </Button>
@@ -238,7 +262,7 @@ export const Header: React.FC<HeaderProps> = ({
                         
                         <div className="py-2">
                           <button
-                            onClick={() => handleNavigation('profile')}
+                            onClick={() => handleNavigation('/profile')}
                             className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50 transition-colors flex items-center space-x-2"
                           >
                             <User className="w-4 h-4" />
@@ -246,7 +270,7 @@ export const Header: React.FC<HeaderProps> = ({
                           </button>
                           
                           <button
-                            onClick={() => handleNavigation('settings')}
+                            onClick={() => handleNavigation('/settings')}
                             className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50 transition-colors flex items-center space-x-2"
                           >
                             <Settings className="w-4 h-4" />
@@ -254,7 +278,7 @@ export const Header: React.FC<HeaderProps> = ({
                           </button>
                           
                           <button
-                            onClick={() => handleNavigation('help')}
+                            onClick={() => handleNavigation('/faqs')}
                             className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50 transition-colors flex items-center space-x-2"
                           >
                             <HelpCircle className="w-4 h-4" />
@@ -297,9 +321,9 @@ export const Header: React.FC<HeaderProps> = ({
                   return (
                     <button
                       key={item.name}
-                      onClick={() => handleNavigation(item.view)}
+                      onClick={() => handleNavigation(item.path)}
                       className={`w-full text-left px-3 py-2 text-base font-medium rounded-lg transition-colors flex items-center space-x-2 ${
-                        currentView === item.view
+                        location.pathname === item.path
                           ? 'text-emerald-400 bg-emerald-900/20'
                           : 'text-gray-300 hover:text-emerald-400 hover:bg-gray-700/50'
                       }`}

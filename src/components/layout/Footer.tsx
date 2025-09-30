@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Heart, Mail, Github, Linkedin, Twitter, Instagram } from 'lucide-react';
+import logoImage from '../../assets/Logo.png';
 
 interface FooterProps {
   // Footer component no longer needs navigation props
@@ -22,8 +23,23 @@ export const Footer: React.FC<FooterProps> = () => {
           {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">M</span>
+              <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg p-1 border-2 border-purple-400 shadow-lg shadow-purple-500/25">
+                <img 
+                  src={logoImage} 
+                  alt="Munus Logo" 
+                  className="w-full h-full object-contain transition-all duration-300"
+                  onError={(e) => {
+                    console.log('Logo failed to load in footer:', e);
+                    // Hide image and show fallback
+                    (e.target as HTMLImageElement).style.display = 'none';
+                    const fallback = (e.target as HTMLImageElement).nextElementSibling;
+                    if (fallback) fallback.classList.remove('hidden');
+                  }}
+                  onLoad={() => console.log('Logo loaded successfully in footer')}
+                />
+                <div className="hidden w-full h-full bg-purple-600 rounded-md flex items-center justify-center text-white font-bold text-xs">
+                  M
+                </div>
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Munus

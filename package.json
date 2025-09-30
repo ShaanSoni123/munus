@@ -15,6 +15,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@types/react-router-dom": "^5.3.3",
     "@vercel/analytics": "^1.5.0",
     "axios": "^1.10.0",
     "country-state-city": "^3.2.1",
@@ -22,6 +23,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-phone-input-2": "^2.15.1",
+    "react-router-dom": "^7.9.3",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

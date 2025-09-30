@@ -46,6 +46,33 @@
   @apply focus:ring-cyan-400 focus:ring-offset-gray-900;
 }
 
+/* Header button styles for better visibility */
+.btn-login {
+  color: white !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  background: transparent !important;
+  backdrop-filter: blur(4px) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
+
+.btn-login:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: white !important;
+}
+
+.btn-get-started {
+  color: white !important;
+  background: linear-gradient(to right, #10b981, #06b6d4) !important;
+  border: none !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+.btn-get-started:hover {
+  background: linear-gradient(to right, #059669, #0891b2) !important;
+  color: white !important;
+}
+
 /* Desi theme focus ring */
 .desi .focus-ring {
   @apply focus:ring-orange-500 focus:ring-offset-orange-50;

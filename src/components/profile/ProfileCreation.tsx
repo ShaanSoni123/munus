@@ -13,6 +13,7 @@ import 'react-phone-input-2/lib/material.css';
 import { Country, State, City } from 'country-state-city';
 import { api } from '../../services/api';
 import { track } from '@vercel/analytics';
+import logoImage from '../../assets/Logo.png';
 
 type ViewType = 'home' | 'jobs' | 'resume' | 'profile' | 'create-profile' | 'dashboard' | 'post-job' | 'candidates' | 'faqs' | 'contact' | 'settings' | 'notifications' | 'application-detail' | 'privacy' | 'terms' | 'google-callback';
 
@@ -536,9 +537,11 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
         <div className="flex items-center justify-center space-x-2 mb-4">
           <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
             <img 
-              src="/Users/shaansoni/Documents/Screenshot 2025-08-14 at 12.56.36 AM.png" 
+              src={logoImage} 
               alt="Munus Logo" 
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain bg-white rounded-md p-1"
+              onError={(e) => console.log('Logo failed to load in profile creation:', e)}
+              onLoad={() => console.log('Logo loaded successfully in profile creation')}
             />
           </div>
           <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
@@ -1623,18 +1626,6 @@ export const ProfileCreation: React.FC<ProfileCreationProps> = ({ onComplete, on
       <div className="max-w-4xl mx-auto px-3 sm:px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="flex items-center justify-center space-x-2 mb-4">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
-              <img 
-                src="/Users/shaansoni/Documents/Screenshot 2025-08-14 at 12.56.36 AM.png" 
-                alt="Munus Logo" 
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
-              Munus
-            </h1>
-          </div>
           <h2 className={`text-2xl sm:text-3xl font-bold mb-2 ${
             theme === 'light' ? 'text-gray-900' : 'text-white'
           }`}>

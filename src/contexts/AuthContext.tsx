@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { authService, type LoginRequest, type RegisterRequest } from '../services/authService';
-import { userService } from '../services/userService';
+import { authService, type RegisterRequest } from '../services/authService';
 import type { User } from '../types';
 
 interface AuthContextValue {
@@ -160,8 +159,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       authService.logout();
       setUser(null);
-      // Redirect to home page after logout
-      window.location.href = '/';
+      // Let the router handle navigation instead of forcing a page reload
+      window.dispatchEvent(new CustomEvent('auth-logout'));
     } catch (error) {
       console.error('Logout error:', error);
     }
