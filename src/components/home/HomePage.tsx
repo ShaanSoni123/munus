@@ -3,7 +3,6 @@ import { ArrowRight, CheckCircle, Sparkles, Linkedin, Instagram, Users, Shield, 
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
-import { VideoDemo } from './VideoDemo';
 import { useTheme } from '../../contexts/ThemeContext';
 import { track } from '@vercel/analytics';
 
@@ -216,13 +215,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
                   <span className="block font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
                     Job Platform
                 </span>
-                  <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl text-gray-300">
-                    One Subscription
-                </span>
               </h1>
               
                 <p className="text-lg sm:text-xl md:text-2xl leading-relaxed text-gray-300 max-w-2xl" style={{ cursor: 'pointer', userSelect: 'none' }}>
-                  Stop juggling multiple job sites and subscriptions - Munus gives you access to all best-in-class AI-powered job matching, resume building, and career development tools for just $12/month.
+                  Stop juggling multiple job sites - Munus gives you AI-powered job matching, intelligent resume building with video introductions, comprehensive career insights, and direct connections with top employers. Everything you need to land your dream job, all in one place.
               </p>
             </div>
               
@@ -257,9 +253,54 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
               </p>
             </div>
             
-                        {/* Right Content - Video Demo */}
+                        {/* Right Content - Features Showcase */}
             <div className="relative">
-              <VideoDemo />
+              <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 shadow-2xl shadow-emerald-500/10">
+                <div className="space-y-6">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+                      <TargetIcon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white">AI-Powered Matching</h3>
+                      <p className="text-sm text-gray-400">Smart job recommendations</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                      <SparklesIcon className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white">Resume Builder</h3>
+                      <p className="text-sm text-gray-400">ATS-optimized resumes</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center">
+                      <Globe className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white">Global Network</h3>
+                      <p className="text-sm text-gray-400">Access worldwide opportunities</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                      <Shield className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold text-white">Secure Platform</h3>
+                      <p className="text-sm text-gray-400">Enterprise-grade security</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Glow Effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 rounded-2xl blur-3xl -z-10"></div>
+              </div>
             </div>
           </div>
         </div>
