@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTheme } from '../../contexts/ThemeContext';
-import { Heart, Mail, Github, Linkedin, Twitter, Instagram } from 'lucide-react';
+import { Heart, Mail, Github, Linkedin } from 'lucide-react';
 import logoImage from '../../assets/Logo.png';
 
 interface FooterProps {
@@ -58,19 +58,12 @@ export const Footer: React.FC<FooterProps> = () => {
               } transition-colors`}>
                 <Mail className="w-5 h-5" />
               </a>
-              <a href="#" className={`p-2 rounded-lg ${
+              <a href="https://www.linkedin.com/company/gomunus/" target="_blank" rel="noopener noreferrer" className={`p-2 rounded-lg ${
                 theme === 'light' 
                   ? 'text-gray-600 hover:text-blue-600 hover:bg-blue-50' 
                   : 'text-gray-400 hover:text-blue-400 hover:bg-blue-900/20'
               } transition-colors`}>
                 <Linkedin className="w-5 h-5" />
-              </a>
-              <a href="#" className={`p-2 rounded-lg ${
-                theme === 'light' 
-                  ? 'text-gray-600 hover:text-blue-600 hover:bg-blue-50' 
-                  : 'text-gray-400 hover:text-blue-400 hover:bg-blue-900/20'
-              } transition-colors`}>
-                <Twitter className="w-5 h-5" />
               </a>
               <a href="https://github.com/GoMunus" target="_blank" rel="noopener noreferrer" className={`p-2 rounded-lg ${
                 theme === 'light' 
@@ -78,13 +71,6 @@ export const Footer: React.FC<FooterProps> = () => {
                   : 'text-gray-400 hover:text-blue-400 hover:bg-blue-900/20'
               } transition-colors`}>
                 <Github className="w-5 h-5" />
-              </a>
-              <a href="#" className={`p-2 rounded-lg ${
-                theme === 'light' 
-                  ? 'text-gray-600 hover:text-blue-600 hover:bg-blue-50' 
-                  : 'text-gray-400 hover:text-blue-400 hover:bg-blue-900/20'
-              } transition-colors`}>
-                <Instagram className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -125,24 +111,7 @@ export const Footer: React.FC<FooterProps> = () => {
                   Terms of Service
                 </a>
               </li>
-              <li>
-                <a href="#" className={`text-sm ${
-                  theme === 'light' 
-                    ? 'text-gray-600 hover:text-blue-600' 
-                    : 'text-gray-400 hover:text-blue-400'
-                } transition-colors`}>
-                  Help Center
-                </a>
-              </li>
-              <li>
-                <a href="#" className={`text-sm ${
-                  theme === 'light' 
-                    ? 'text-gray-600 hover:text-blue-600' 
-                    : 'text-gray-400 hover:text-blue-400'
-                } transition-colors`}>
-                  Contact Support
-                </a>
-              </li>
+              
             </ul>
           </div>
 
@@ -155,7 +124,7 @@ export const Footer: React.FC<FooterProps> = () => {
             </h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className={`text-sm ${
+                <a href="/about" className={`text-sm ${
                   theme === 'light' 
                     ? 'text-gray-600 hover:text-blue-600' 
                     : 'text-gray-400 hover:text-blue-400'
@@ -163,33 +132,7 @@ export const Footer: React.FC<FooterProps> = () => {
                   About Us
                 </a>
               </li>
-              <li>
-                <a href="#" className={`text-sm ${
-                  theme === 'light' 
-                    ? 'text-gray-600 hover:text-blue-600' 
-                    : 'text-gray-400 hover:text-blue-400'
-                } transition-colors`}>
-                  Careers
-                </a>
-              </li>
-              <li>
-                <a href="#" className={`text-sm ${
-                  theme === 'light' 
-                    ? 'text-gray-600 hover:text-blue-600' 
-                    : 'text-gray-400 hover:text-blue-400'
-                } transition-colors`}>
-                  Press
-                </a>
-              </li>
-              <li>
-                <a href="#" className={`text-sm ${
-                  theme === 'light' 
-                    ? 'text-gray-600 hover:text-blue-600' 
-                    : 'text-gray-400 hover:text-blue-400'
-                } transition-colors`}>
-                  Blog
-                </a>
-              </li>
+              
             </ul>
           </div>
         </div>

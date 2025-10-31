@@ -14,6 +14,7 @@ import HomePage from '../pages/public/HomePage';
 import JobsPage from '../pages/public/JobsPage';
 import ContactPage from '../pages/public/ContactPage';
 import FAQPage from '../pages/public/FAQPage';
+import AboutPage from '../pages/public/AboutPage';
 
 // Auth Pages
 import LoginPage from '../pages/auth/LoginPage';
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
       {
         path: 'faqs',
         element: <FAQPage />,
+      },
+      {
+        path: 'about',
+        element: <AboutPage />,
       },
       {
         path: 'resume',
