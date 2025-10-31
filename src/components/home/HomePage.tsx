@@ -482,17 +482,21 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
       {showVideoModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="relative bg-gray-900 rounded-2xl p-6 max-w-4xl w-full">
-              <button
-                onClick={closeVideoModal}
+            <button
+              onClick={closeVideoModal}
               className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+              aria-label="Close video"
             >
               <X className="w-6 h-6" />
-              </button>
-            <div className="aspect-video bg-gray-800 rounded-xl flex items-center justify-center">
-              <div className="text-center">
-                <Play className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
-                <p className="text-gray-300">Demo video will be displayed here</p>
-              </div>
+            </button>
+            <div className="aspect-video bg-black rounded-xl overflow-hidden">
+              <iframe
+                src="https://www.youtube.com/embed/R99z6mZvrTE?autoplay=1&rel=0&modestbranding=1&color=white"
+                title="Munus Demo Video"
+                className="w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
             </div>
           </div>
         </div>
