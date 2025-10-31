@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, CheckCircle, Sparkles, Linkedin, Instagram, Users, Shield, Globe, TrendingUp, Clock, Award, Star, Building, Briefcase, Heart, Target, ChevronRight, ExternalLink, Rocket, Play, Target as TargetIcon, Sparkles as SparklesIcon, X } from 'lucide-react';
+import { ArrowRight, Sparkles, Users, Shield, Globe, TrendingUp, Clock, Award, Star, Building, Briefcase, Heart, ChevronRight, Rocket, Play, Target as TargetIcon, Sparkles as SparklesIcon, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
@@ -104,26 +104,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
     }
   ];
 
-  const inspirationalContent = [
-    {
-      title: 'Intelligent Job Matching',
-      content: "Experience AI-powered job recommendations that understand your skills, preferences, and career objectives to suggest the most relevant opportunities.",
-      icon: '🎯',
-      highlight: 'AI-Powered'
-    },
-    {
-      title: 'Career Advancement',
-      content: "Build professional resumes with our intelligent builder, receive career guidance, and access tools designed to accelerate your professional development.",
-      icon: '📈',
-      highlight: 'Career Development'
-    },
-    {
-      title: 'Professional Excellence',
-      content: "Join a platform that connects ambitious professionals with established companies, creating valuable career opportunities for career-focused individuals.",
-      icon: '🚀',
-      highlight: 'Innovation First'
-    }
-  ];
+  // Removed unused inspirationalContent block
 
   const handleGetStarted = () => {
     track('homepage_get_started_clicked', {
@@ -149,13 +130,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
     onResumeBuilder();
   };
 
-  const handleSignIn = () => {
-    track('homepage_sign_in_clicked', {
-      section: 'header',
-      user_type: 'visitor'
-    });
-    onSignIn();
-  };
+  // Removed unused handleSignIn (header handles sign-in elsewhere)
 
   const openVideoModal = () => {
     track('homepage_video_modal_opened', {
@@ -306,77 +281,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
         </div>
       </section>
 
-      {/* Coming Soon Section */}
-      <section className="py-20 bg-gradient-to-br from-emerald-900/20 via-teal-900/20 to-cyan-900/20 relative overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-emerald-500/5 to-cyan-500/5"></div>
-        
-        {/* Floating Elements */}
-        <div className="absolute top-10 left-10 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute bottom-10 right-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-teal-500/10 rounded-full blur-xl animate-pulse delay-500"></div>
-        
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="space-y-8">
-            {/* Badge */}
-            <div className="inline-flex items-center px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30 text-emerald-400 text-lg font-semibold backdrop-blur-sm">
-              <Sparkles className="w-5 h-5 mr-3 animate-pulse" />
-              Something Amazing is Coming
-            </div>
-            
-            {/* Main Heading */}
-            <div className="space-y-6">
-              <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-tight text-white">
-                <span className="block">Coming Soon,</span>
-                <span className="block bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent animate-pulse">
-                  Munus
-                </span>
-              </h2>
-              
-              <p className="text-xl sm:text-2xl md:text-3xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-                We're building something extraordinary that will revolutionize how you find your dream job. 
-                <span className="text-emerald-400 font-semibold"> Get ready for the future of career success.</span>
-              </p>
-            </div>
-            
-            {/* Excitement Elements */}
-            <div className="flex flex-wrap justify-center items-center gap-8 mt-12">
-              <div className="flex items-center space-x-3 px-6 py-3 rounded-full bg-gray-800/50 border border-gray-700/50 backdrop-blur-sm">
-                <Rocket className="w-6 h-6 text-emerald-400 animate-bounce" />
-                <span className="text-white font-semibold">Revolutionary AI</span>
-              </div>
-              <div className="flex items-center space-x-3 px-6 py-3 rounded-full bg-gray-800/50 border border-gray-700/50 backdrop-blur-sm">
-                <Star className="w-6 h-6 text-cyan-400 animate-pulse" />
-                <span className="text-white font-semibold">Game-Changing Features</span>
-              </div>
-              <div className="flex items-center space-x-3 px-6 py-3 rounded-full bg-gray-800/50 border border-gray-700/50 backdrop-blur-sm">
-                <Heart className="w-6 h-6 text-teal-400 animate-pulse" />
-                <span className="text-white font-semibold">Built for You</span>
-              </div>
-            </div>
-            
-            {/* Call to Action */}
-            <div className="pt-8">
-              <Button 
-                variant="primary" 
-                size="xl"
-                onClick={handleGetStarted}
-                icon={<ArrowRight className="w-6 h-6" />}
-                iconPosition="right"
-                className="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-bold px-12 py-6 text-xl shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-emerald-500/25"
-              >
-                Be the First to Know
-              </Button>
-            </div>
-            
-            {/* Subtitle */}
-            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Join our early access list and be among the first to experience the future of job searching
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Removed outdated "Coming Soon" section after launch */}
 
       {/* Features Section */}
       <section className="py-20 bg-gray-800/30">
