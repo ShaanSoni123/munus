@@ -405,7 +405,6 @@ export const TermsOfService: React.FC = () => {
               }`}>
                 <p className="font-semibold">Munus Technologies Pvt. Ltd.</p>
                 <p>Email: <a href="mailto:team@gomunus.com" className="underline hover:no-underline">team@gomunus.com</a></p>
-                <p>Address: [Your Company Address]</p>
               </div>
             </div>
           </div>
