@@ -1,58 +1,26 @@
 import React from 'react';
-import { Play, Pause, Volume2, VolumeX, Maximize2, Settings } from 'lucide-react';
+import { Play } from 'lucide-react';
 
 interface VideoDemoProps {
   className?: string;
 }
 
 export const VideoDemo: React.FC<VideoDemoProps> = ({ className = '' }) => {
+  const videoId = 'R99z6mZvrTE';
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&color=white`;
+  const watchUrl = `https://youtu.be/${videoId}`;
   return (
     <div className={`relative bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 shadow-2xl shadow-emerald-500/10 ${className}`}>
       {/* Video Player Container */}
-      <div className="relative aspect-video bg-gray-900 rounded-xl overflow-hidden">
-        {/* Video Placeholder */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-emerald-500/20 border border-emerald-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Play className="w-10 h-10 text-emerald-400" />
-            </div>
-            <p className="text-gray-300 text-lg font-medium">Demo Video</p>
-            <p className="text-gray-400 text-sm mt-2">Your video content will appear here</p>
-          </div>
-        </div>
-        
-        {/* Video Controls Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <button className="p-2 text-white hover:text-emerald-400 transition-colors">
-                <Play className="w-5 h-5" />
-              </button>
-              <button className="p-2 text-white hover:text-emerald-400 transition-colors">
-                <Pause className="w-5 h-5" />
-              </button>
-              <button className="p-2 text-white hover:text-emerald-400 transition-colors">
-                <Volume2 className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <button className="p-2 text-white hover:text-emerald-400 transition-colors">
-                <Settings className="w-4 h-4" />
-              </button>
-              <button className="p-2 text-white hover:text-emerald-400 transition-colors">
-                <Maximize2 className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        {/* Progress Bar */}
-        <div className="absolute bottom-16 left-4 right-4">
-          <div className="w-full bg-gray-700/50 rounded-full h-1">
-            <div className="bg-emerald-500 h-1 rounded-full w-1/3"></div>
-          </div>
-        </div>
+      <div className="relative aspect-video bg-black rounded-xl overflow-hidden">
+        <iframe
+          src={embedUrl}
+          title="Munus Demo Video"
+          className="absolute inset-0 h-full w-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          loading="lazy"
+        />
       </div>
       
       {/* Video Info */}
@@ -66,10 +34,11 @@ export const VideoDemo: React.FC<VideoDemoProps> = ({ className = '' }) => {
           Watch how our AI-powered job matching platform helps you find the perfect opportunities and build professional resumes.
         </p>
         
-        <div className="flex items-center space-x-4 text-xs text-gray-400">
-          <span>Duration: 2:45</span>
-          <span>Views: 1.2K</span>
+        <div className="flex items-center justify-between text-xs text-gray-400">
           <span>Quality: HD</span>
+          <a href={watchUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300">
+            <Play className="w-3.5 h-3.5" /> Watch on YouTube
+          </a>
         </div>
       </div>
       
