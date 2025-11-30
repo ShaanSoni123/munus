@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Sparkles, Users, Shield, Globe, TrendingUp, Clock, Award, Star, Building, Briefcase, Heart, ChevronRight, Rocket, Play, Target as TargetIcon, Sparkles as SparklesIcon, X } from 'lucide-react';
+import { ArrowRight, Sparkles, Users, Shield, Globe, TrendingUp, Clock, Award, Building, Briefcase, Heart, ChevronRight, Rocket, Play, Target as TargetIcon, Sparkles as SparklesIcon, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
@@ -177,12 +177,6 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
             
             {/* Left Content - Marketing */}
             <div className="space-y-8 text-left">
-              {/* Badge */}
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-amber-900/20 border border-amber-700/30 text-amber-400 text-sm font-medium">
-                <Star className="w-4 h-4 mr-2" />
-                Built by Industry Experts
-              </div>
-
               {/* Main Headline */}
               <div className="space-y-6" style={{ cursor: 'pointer', userSelect: 'none' }}>
                 <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-white interactive-heading" style={{ cursor: 'pointer', userSelect: 'none' }}>
