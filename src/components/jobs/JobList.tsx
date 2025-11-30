@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Briefcase, AlertCircle, Filter, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { JobCard } from './JobCard';
 import { JobApplicationModal } from './JobApplicationModal';
 import { JobFilters } from './JobFilters';
@@ -21,6 +22,7 @@ export const JobList: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { theme } = useTheme();
   const { success, error: showError } = useToast();
+  const navigate = useNavigate();
   
   const {
     filteredJobs,
@@ -45,7 +47,8 @@ export const JobList: React.FC = () => {
 
   const handleApply = (jobId: string) => {
     if (!isAuthenticated) {
-      showError('Login Required', 'Please login to apply for jobs');
+      // Redirect to login page when not authenticated
+      navigate('/login');
       return;
     }
     
