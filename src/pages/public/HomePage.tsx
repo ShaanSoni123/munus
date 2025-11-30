@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
     if (isAuthenticated) {
       navigate('/dashboard');
     } else {
-      navigate('/create-profile');
+      navigate('/auth-choice');
     }
   };
 

@@ -12,7 +12,18 @@ const LoginPage: React.FC = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      const storedUser = localStorage.getItem('skillglide-user');
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        // If user has no role, redirect to role selection, otherwise go to dashboard
+        if (!user.role) {
+          navigate('/role-selection');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        navigate('/dashboard');
+      }
     }
   }, [isAuthenticated, navigate]);
 

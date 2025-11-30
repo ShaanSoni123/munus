@@ -157,7 +157,7 @@ export const JobList: React.FC = () => {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Find Your Dream Job
+            Find Your Next Opportunity
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
             {sortedJobs.length} {sortedJobs.length === 1 ? 'job' : 'jobs'} found

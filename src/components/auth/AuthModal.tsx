@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Mail, Lock, User, Building, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -20,7 +21,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onGetStarted,
 }) => {
   const [mode, setMode] = useState<'login' | 'register'>(defaultMode);
-  const [userType, setUserType] = useState<'jobseeker' | 'employer'>('jobseeker');
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -33,6 +33,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   
   const { login, register, loading } = useAuth();
   const { theme } = useTheme();
+  const navigate = useNavigate();
 
   // Reset form when modal opens/closes
   useEffect(() => {
@@ -80,10 +81,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       } else if (formData.name.trim().length < 2) {
         newErrors.name = 'Name must be at least 2 characters';
       }
-      
-      if (userType === 'employer' && !formData.company.trim()) {
-        newErrors.company = 'Company name is required';
-      }
     }
 
     setErrors(newErrors);
@@ -102,21 +99,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     try {
       if (mode === 'login') {
-        console.log('🔐 Starting login process...', { email: formData.email, role: userType });
-        await login(formData.email, formData.password, userType);
+        console.log('🔐 Starting login process...', { email: formData.email });
+        await login(formData.email, formData.password, 'jobseeker'); // Role parameter not used, will get from DB
         console.log('✅ Login successful, closing modal');
         onClose();
+        // Redirect will be handled by LoginPage useEffect
       } else {
-        console.log('📝 Starting registration process...', { email: formData.email, role: userType });
+        console.log('📝 Starting registration process...', { email: formData.email });
         await register({
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          role: userType,
-          ...(userType === 'employer' && { company: formData.company }),
         });
-        console.log('✅ Registration successful, closing modal');
+        console.log('✅ Registration successful, redirecting to role selection');
         onClose();
+        // Redirect to role selection after registration
+        // Use setTimeout to ensure state is updated first
+        setTimeout(() => {
+          navigate('/role-selection');
+        }, 100);
       }
     } catch (error: any) {
       console.error('Authentication error:', error);
@@ -159,14 +160,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     const redirectUri = `${window.location.origin}/google-callback`;
     const scope = 'openid email profile';
     const responseType = 'code';
-    const state = btoa(JSON.stringify({ userType, returnUrl: window.location.pathname }));
     
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
       `client_id=${encodeURIComponent(clientId)}&` +
       `redirect_uri=${encodeURIComponent(redirectUri)}&` +
       `scope=${encodeURIComponent(scope)}&` +
-      `response_type=${encodeURIComponent(responseType)}&` +
-      `state=${encodeURIComponent(state)}`;
+      `response_type=${encodeURIComponent(responseType)}`;
     
     console.log('🔄 Redirecting to Google OAuth:', googleAuthUrl);
     window.location.href = googleAuthUrl;
@@ -199,39 +198,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </p>
         </div>
 
-        {/* User Type Selection */}
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-            I am a:
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => setUserType('jobseeker')}
-              className={`p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
-                userType === 'jobseeker'
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 shadow-md'
-                  : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
-              }`}
-            >
-              <User className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-sm font-medium">Job Seeker</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setUserType('employer')}
-              className={`p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
-                userType === 'employer'
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 shadow-md'
-                  : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800'
-              }`}
-            >
-              <Building className="w-5 h-5 mx-auto mb-1" />
-              <span className="text-sm font-medium">Employer</span>
-            </button>
-          </div>
-        </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'register' && (
             <Input
@@ -247,19 +213,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             />
           )}
 
-          {mode === 'register' && userType === 'employer' && (
-            <Input
-              label="Company Name"
-              placeholder="Tech Corp"
-              value={formData.company}
-              onChange={(e) => updateFormData('company', e.target.value)}
-              icon={<Building className="w-4 h-4" />}
-              error={errors.company}
-              required
-              fullWidth
-              disabled={isSubmitting}
-            />
-          )}
 
           <Input
             label="Email Address"

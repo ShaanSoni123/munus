@@ -12,6 +12,14 @@
       "destination": "/"
     },
     {
+      "source": "/google-callback",
+      "destination": "/"
+    },
+    {
+      "source": "/role-selection",
+      "destination": "/"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }

@@ -1,2 +1,7 @@
 /* /index.html 200
 
+# Google OAuth callback route
+/google-callback /index.html 200
+
+# Role selection route  
+/role-selection /index.html 200

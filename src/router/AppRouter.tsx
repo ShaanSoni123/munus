@@ -21,6 +21,8 @@ import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
 import CreateProfilePage from '../pages/auth/CreateProfilePage';
 import GoogleCallbackPage from '../pages/auth/GoogleCallbackPage';
+import AuthChoicePage from '../pages/auth/AuthChoicePage';
+import RoleSelectionPage from '../pages/auth/RoleSelectionPage';
 
 // Dashboard Pages
 import DashboardPage from '../pages/dashboard/DashboardPage';
@@ -175,7 +177,16 @@ const router = createBrowserRouter([
         path: 'google-callback',
         element: <GoogleCallbackPage />,
       },
+      {
+        path: 'role-selection',
+        element: <RoleSelectionPage />,
+      },
     ],
+  },
+  // Auth Choice Page (entry point)
+  {
+    path: '/auth-choice',
+    element: <AuthChoicePage />,
   },
   // Redirect legacy auth routes
   {
@@ -193,6 +204,10 @@ const router = createBrowserRouter([
   {
     path: '/google-callback',
     element: <GoogleCallbackPage />,
+  },
+  {
+    path: '/role-selection',
+    element: <RoleSelectionPage />,
   },
   // Legal Routes (no header/footer)
   {

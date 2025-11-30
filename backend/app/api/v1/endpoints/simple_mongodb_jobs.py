@@ -42,7 +42,7 @@ async def shutdown_event():
 @router.get("/", response_model=Dict[str, Any])
 async def list_jobs(
     page: int = Query(1, ge=1, description="Page number"),
-    limit: int = Query(20, ge=1, le=100, description="Items per page"),
+    limit: int = Query(10, ge=1, le=100, description="Items per page"),
     location: Optional[str] = Query(None, description="Filter by location"),
     job_type: Optional[str] = Query(None, description="Filter by job type")
 ):

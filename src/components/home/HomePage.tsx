@@ -186,14 +186,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onGetStarted, onSignIn, onFi
               {/* Main Headline */}
               <div className="space-y-6" style={{ cursor: 'pointer', userSelect: 'none' }}>
                 <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-white interactive-heading" style={{ cursor: 'pointer', userSelect: 'none' }}>
-                  World's Most Powerful
+                  Find Your Next
                   <span className="block font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-                    Job Platform
+                    Opportunity
                 </span>
               </h1>
               
                 <p className="text-lg sm:text-xl md:text-2xl leading-relaxed text-gray-300 max-w-2xl" style={{ cursor: 'pointer', userSelect: 'none' }}>
-                  Stop juggling multiple job sites - Munus gives you AI-powered job matching, intelligent resume building with video introductions, comprehensive career insights, and direct connections with top employers. Everything you need to land your dream job, all in one place.
+                  Stop juggling multiple job sites - Munus gives you AI-powered job matching, intelligent resume building with video introductions, comprehensive career insights, and direct connections with top employers. Everything you need to find your next opportunity, all in one place.
               </p>
             </div>
               

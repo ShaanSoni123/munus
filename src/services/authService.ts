@@ -30,7 +30,7 @@ export interface AuthResponse {
 }
 
 class AuthService {
-  async login(email: string, password: string, role: 'jobseeker' | 'employer'): Promise<any> {
+  async login(email: string, password: string, role?: 'jobseeker' | 'employer'): Promise<any> {
     try {
       console.log('🔐 AuthService: Attempting login', { email, role });
       // Don't send role to backend - it will be retrieved from the user's stored data
@@ -69,22 +69,13 @@ class AuthService {
     try {
       console.log('📝 AuthService: Attempting registration', userData);
       
-      // Prepare payload with all necessary fields
+      // Prepare payload - role will be selected after registration
       const payload = {
         email: userData.email,
         password: userData.password,
         name: userData.name,
-        role: userData.role,
         phone: userData.phone,
         location: userData.location,
-        ...(userData.role === 'employer' && { company: userData.company }),
-        ...(userData.role === 'jobseeker' && {
-          skills: userData.skills || [],
-          experience_years: userData.experience_years,
-          preferred_job_types: userData.preferred_job_types || [],
-          preferred_locations: userData.preferred_locations || [],
-          salary_expectations: userData.salary_expectations,
-        }),
       };
 
       console.log('📤 AuthService: Sending registration payload', payload);

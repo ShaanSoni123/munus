@@ -9,10 +9,22 @@ const RegisterPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(true);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (but check for role first)
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      const storedUser = localStorage.getItem('skillglide-user');
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        // If user has no role, redirect to role selection, otherwise go to dashboard
+        if (!user.role || user.role === null || user.role === undefined) {
+          navigate('/role-selection');
+        } else {
+          navigate('/dashboard');
+        }
+      } else {
+        // If no user data, go to role selection to be safe
+        navigate('/role-selection');
+      }
     }
   }, [isAuthenticated, navigate]);
 

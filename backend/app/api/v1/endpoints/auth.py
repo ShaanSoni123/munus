@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from datetime import datetime, timedelta
 from typing import Optional
 from app.db.database import get_users_collection
@@ -50,11 +51,11 @@ async def register(user_data: dict, users_collection=Depends(get_users_db)):
             logger.error(f"Password hashing failed: {e}")
             raise HTTPException(status_code=500, detail=f"Password hashing failed: {str(e)}")
         
-        # Prepare user document
+        # Prepare user document - role will be set later via role selection
         user_doc = {
             "email": user_data["email"],
             "name": user_data.get("name"),
-            "role": user_data.get("role", "jobseeker"),
+            "role": None,  # Role will be selected after registration
             "password": hashed_password.decode("utf-8"),
             "phone": user_data.get("phone"),
             "location": user_data.get("location"),
@@ -66,24 +67,19 @@ async def register(user_data: dict, users_collection=Depends(get_users_db)):
             "email_verified": False,
         }
         
-        # Add employer-specific fields
-        if user_data.get("role") == "employer":
-            user_doc.update({
-                "company_name": user_data.get("company"),
-                "jobs_posted": 0,
-                "company_id": None,  # Will be set when company is created
-            })
-        else:
-            # Job seeker specific fields
-            user_doc.update({
-                "skills": user_data.get("skills", []),
-                "experience_years": user_data.get("experience_years"),
-                "preferred_job_types": user_data.get("preferred_job_types", []),
-                "preferred_locations": user_data.get("preferred_locations", []),
-                "salary_expectations": user_data.get("salary_expectations"),
-                "jobs_applied": 0,
-                "profile_views": 0,
-            })
+        # Add default fields for both roles (will be updated when role is selected)
+        user_doc.update({
+            "skills": [],
+            "experience_years": None,
+            "preferred_job_types": [],
+            "preferred_locations": [],
+            "salary_expectations": None,
+            "jobs_applied": 0,
+            "profile_views": 0,
+            "company_name": None,
+            "jobs_posted": 0,
+            "company_id": None,
+        })
         
         logger.info(f"User document prepared: {user_doc}")
         
@@ -100,9 +96,9 @@ async def register(user_data: dict, users_collection=Depends(get_users_db)):
         user_response = user_doc.copy()
         user_response.pop("password", None)
         
-        # Create JWT token
+        # Create JWT token (role may be None initially)
         try:
-            access_token = create_access_token({"sub": user_doc["email"], "role": user_doc["role"]})
+            access_token = create_access_token({"sub": user_doc["email"], "role": user_doc.get("role")})
             logger.info("JWT token created successfully")
         except Exception as e:
             logger.error(f"JWT token creation failed: {e}")
@@ -194,6 +190,91 @@ async def get_current_user(users_collection=Depends(get_users_db)):
         raise HTTPException(status_code=500, detail=f"Failed to get user info: {str(e)}")
 
 
+@router.post("/update-role")
+async def update_user_role(
+    role_data: dict,
+    users_collection=Depends(get_users_db),
+    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())
+):
+    """Update user role after authentication"""
+    try:
+        # Get token from Authorization header
+        token = credentials.credentials
+        
+        # Verify token and get email
+        from app.core.security import verify_token
+        email = verify_token(token)
+        
+        if not email:
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
+        
+        new_role = role_data.get("role")
+        
+        if not new_role:
+            raise HTTPException(status_code=400, detail="Role is required")
+        
+        if new_role not in ["jobseeker", "employer"]:
+            raise HTTPException(status_code=400, detail="Invalid role. Must be 'jobseeker' or 'employer'")
+        
+        # Find user
+        user = await users_collection.find_one({"email": email})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Update role and role-specific fields
+        update_data = {
+            "role": new_role,
+            "updated_at": datetime.utcnow()
+        }
+        
+        # Add role-specific fields
+        if new_role == "employer":
+            update_data.update({
+                "company_name": None,
+                "jobs_posted": 0,
+                "company_id": None,
+            })
+        else:  # jobseeker
+            update_data.update({
+                "skills": [],
+                "experience_years": None,
+                "preferred_job_types": [],
+                "preferred_locations": [],
+                "salary_expectations": None,
+                "jobs_applied": 0,
+                "profile_views": 0,
+            })
+        
+        # Update role
+        await users_collection.update_one(
+            {"email": email},
+            {"$set": update_data}
+        )
+        
+        # Get updated user
+        updated_user = await users_collection.find_one({"email": email})
+        updated_user.pop("password", None)
+        if "_id" in updated_user:
+            updated_user["_id"] = str(updated_user["_id"])
+        
+        # Create new token with updated role
+        access_token = create_access_token({"sub": email, "role": new_role})
+        
+        logger.info(f"User role updated: {email} -> {new_role}")
+        
+        return {
+            "access_token": access_token,
+            "user": updated_user,
+            "message": "Role updated successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating user role: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to update role: {str(e)}")
+
+
 # Google OAuth endpoints
 @router.get("/google/url")
 async def get_google_auth_url():
@@ -217,36 +298,58 @@ async def google_oauth_callback(auth_data: dict, users_collection=Depends(get_us
     """Handle Google OAuth callback with authorization code"""
     try:
         logger.info("Google OAuth callback received")
+        logger.info(f"Received auth_data keys: {auth_data.keys()}")
         
-        # Get the authorization code and user type
+        # Get the authorization code (no user_type needed - will be selected later)
         code = auth_data.get("code")
-        user_type = auth_data.get("user_type", "jobseeker")
         
         if not code:
+            logger.error("No authorization code provided")
             raise HTTPException(status_code=400, detail="Authorization code is required")
         
-        logger.info(f"Processing Google OAuth for user type: {user_type}")
+        logger.info("Processing Google OAuth (role will be selected after authentication)")
+        
+        # Check if Google OAuth is configured
+        if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
+            logger.error("Google OAuth not configured")
+            raise HTTPException(
+                status_code=500, 
+                detail="Google OAuth is not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET."
+            )
         
         # Exchange authorization code for access token
         user_info = await exchange_google_code_for_user_info(code)
         if not user_info:
-            raise HTTPException(status_code=400, detail="Failed to get user info from Google")
+            logger.error("Failed to exchange code for user info")
+            raise HTTPException(
+                status_code=400, 
+                detail="Failed to get user info from Google. The authorization code may be invalid or expired."
+            )
         
-        logger.info(f"Google user info: {user_info.get('email')}")
+        if not user_info.get("email"):
+            logger.error("No email in user info from Google")
+            raise HTTPException(status_code=400, detail="Google account email is required")
+        
+        logger.info(f"Google user info retrieved: {user_info.get('email')}")
         
         # Check if user already exists
         existing_user = await users_collection.find_one({"email": user_info["email"]})
         
         if existing_user:
-            # User exists, log them in
-            logger.info(f"Existing user logging in via Google: {user_info['email']}")
+            # User exists, log them in (use existing role, don't change it)
+            logger.info(f"Existing user logging in via Google: {user_info['email']} (role: {existing_user.get('role')})")
             user_response = existing_user.copy()
             user_response.pop("password", None)
             if "_id" in user_response:
                 user_response["_id"] = str(user_response["_id"])
             
+            # Ensure role is set (fallback to jobseeker if missing)
+            if "role" not in user_response or not user_response["role"]:
+                logger.warning(f"User {user_info['email']} missing role, defaulting to jobseeker")
+                user_response["role"] = "jobseeker"
+            
             # Create JWT token
-            access_token = create_access_token({"sub": existing_user["email"], "role": existing_user["role"]})
+            access_token = create_access_token({"sub": existing_user["email"], "role": user_response["role"]})
             
             return {
                 "access_token": access_token,
@@ -254,13 +357,13 @@ async def google_oauth_callback(auth_data: dict, users_collection=Depends(get_us
                 "is_new_user": False
             }
         else:
-            # Create new user
+            # Create new user (role will be selected later)
             logger.info(f"Creating new user via Google: {user_info['email']}")
             
             user_doc = {
                 "email": user_info["email"],
-                "name": f"{user_info.get('given_name', '')} {user_info.get('family_name', '')}".strip(),
-                "role": user_type,
+                "name": f"{user_info.get('given_name', '')} {user_info.get('family_name', '')}".strip() or user_info.get("name", "User"),
+                "role": None,  # Role will be selected after authentication
                 "avatar_url": user_info.get("picture"),
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow(),
@@ -271,34 +374,36 @@ async def google_oauth_callback(auth_data: dict, users_collection=Depends(get_us
                 "google_id": user_info.get("id"),
             }
             
-            # Add role-specific fields
-            if user_type == "employer":
-                user_doc.update({
-                    "company_name": None,
-                    "jobs_posted": 0,
-                    "company_id": None,
-                })
-            else:
-                user_doc.update({
-                    "skills": [],
-                    "experience_years": None,
-                    "preferred_job_types": [],
-                    "preferred_locations": [],
-                    "salary_expectations": None,
-                    "jobs_applied": 0,
-                    "profile_views": 0,
-                })
+            # Add default fields for both roles (will be updated when role is selected)
+            user_doc.update({
+                "skills": [],
+                "experience_years": None,
+                "preferred_job_types": [],
+                "preferred_locations": [],
+                "salary_expectations": None,
+                "jobs_applied": 0,
+                "profile_views": 0,
+                "company_name": None,
+                "jobs_posted": 0,
+                "company_id": None,
+            })
             
             # Insert user into database
-            result = await users_collection.insert_one(user_doc)
-            user_doc["_id"] = str(result.inserted_id)
+            try:
+                result = await users_collection.insert_one(user_doc)
+                user_doc["_id"] = str(result.inserted_id)
+                logger.info(f"User created successfully with ID: {result.inserted_id}")
+            except Exception as db_error:
+                logger.error(f"Database error creating user: {db_error}")
+                raise HTTPException(status_code=500, detail="Failed to create user account")
             
-            # Create JWT token
-            access_token = create_access_token({"sub": user_doc["email"], "role": user_doc["role"]})
+            # Create JWT token (role may be None initially)
+            access_token = create_access_token({"sub": user_doc["email"], "role": user_doc.get("role")})
             
             user_response = user_doc.copy()
             user_response.pop("password", None)
             
+            logger.info(f"Google OAuth successful for new user: {user_info['email']} (role will be selected)")
             return {
                 "access_token": access_token,
                 "user": user_response,
@@ -308,8 +413,10 @@ async def google_oauth_callback(auth_data: dict, users_collection=Depends(get_us
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error in Google OAuth callback: {e}")
-        raise HTTPException(status_code=500, detail="Google authentication failed")
+        logger.error(f"Error in Google OAuth callback: {e}", exc_info=True)
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Google authentication failed: {str(e)}")
 
 
 async def exchange_google_code_for_user_info(code: str):
@@ -317,8 +424,17 @@ async def exchange_google_code_for_user_info(code: str):
     try:
         import httpx
         
-        async with httpx.AsyncClient() as client:
+        if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
+            logger.error("Google OAuth credentials not configured")
+            return None
+        
+        if not settings.GOOGLE_REDIRECT_URI:
+            logger.error("GOOGLE_REDIRECT_URI not configured")
+            return None
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
             # Exchange authorization code for access token
+            logger.info("Exchanging authorization code for access token...")
             token_response = await client.post(
                 "https://oauth2.googleapis.com/token",
                 data={
@@ -331,32 +447,66 @@ async def exchange_google_code_for_user_info(code: str):
             )
             
             if token_response.status_code != 200:
-                logger.error(f"Failed to exchange code for token: {token_response.text}")
+                logger.error(f"Failed to exchange code for token. Status: {token_response.status_code}")
+                logger.error(f"Response: {token_response.text}")
+                try:
+                    error_data = token_response.json()
+                    logger.error(f"Error details: {error_data}")
+                except:
+                    pass
                 return None
             
-            token_data = token_response.json()
+            try:
+                token_data = token_response.json()
+            except Exception as json_error:
+                logger.error(f"Failed to parse token response as JSON: {json_error}")
+                logger.error(f"Response text: {token_response.text[:200]}")
+                return None
+            
             access_token = token_data.get("access_token")
             
             if not access_token:
                 logger.error("No access token received from Google")
+                logger.error(f"Token response: {token_data}")
                 return None
             
+            logger.info("Successfully obtained access token from Google")
+            
             # Get user info using the access token
+            logger.info("Fetching user info from Google...")
             user_info_response = await client.get(
                 "https://www.googleapis.com/oauth2/v2/userinfo",
                 headers={"Authorization": f"Bearer {access_token}"}
             )
             
             if user_info_response.status_code != 200:
-                logger.error(f"Failed to get user info: {user_info_response.text}")
+                logger.error(f"Failed to get user info. Status: {user_info_response.status_code}")
+                logger.error(f"Response: {user_info_response.text}")
                 return None
             
-            user_info = user_info_response.json()
-            logger.info(f"Retrieved user info from Google: {user_info.get('email')}")
+            try:
+                user_info = user_info_response.json()
+            except Exception as json_error:
+                logger.error(f"Failed to parse user info response as JSON: {json_error}")
+                logger.error(f"Response text: {user_info_response.text[:200]}")
+                return None
+            
+            if not user_info.get("email"):
+                logger.error("User info missing email field")
+                logger.error(f"User info received: {user_info}")
+                return None
+            
+            logger.info(f"Successfully retrieved user info from Google: {user_info.get('email')}")
             return user_info
             
+    except httpx.TimeoutException:
+        logger.error("Timeout while exchanging Google code for user info")
+        return None
+    except httpx.RequestError as e:
+        logger.error(f"Request error exchanging Google code: {e}")
+        return None
     except Exception as e:
-        logger.error(f"Error exchanging Google code for user info: {e}")
+        logger.error(f"Error exchanging Google code for user info: {e}", exc_info=True)
         return None
 
 
